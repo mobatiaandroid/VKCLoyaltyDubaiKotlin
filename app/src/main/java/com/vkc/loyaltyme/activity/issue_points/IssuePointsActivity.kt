@@ -1,0 +1,322 @@
+package com.vkc.loyaltyme.activity.issue_points
+
+import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.speech.tts.UtteranceProgressListener
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.View
+import android.widget.*
+import android.widget.AdapterView.OnItemClickListener
+import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.R
+import com.vkc.loyaltyme.activity.home.model.my_points.MyPointsModel
+import com.vkc.loyaltyme.activity.issue_points.model.submit_points.SubmitPointsResponse
+import com.vkc.loyaltyme.activity.issue_points.model.user.Data
+import com.vkc.loyaltyme.activity.issue_points.model.user.Response
+import com.vkc.loyaltyme.activity.issue_points.model.user.UserModel
+import com.vkc.loyaltyme.activity.issue_points.model.user_type.TypeModel
+import com.vkc.loyaltyme.api.ApiClient
+import com.vkc.loyaltyme.manager.HeaderManager
+import com.vkc.loyaltyme.manager.PreferenceManager
+import com.vkc.loyaltyme.utils.UtilityMethods
+import retrofit2.Call
+import retrofit2.Callback
+import java.util.ArrayList
+
+class IssuePointsActivity : AppCompatActivity() {
+    lateinit var context: Activity
+    lateinit var header: LinearLayout
+    lateinit var headerManager: HeaderManager
+    lateinit var autoSearch: AutoCompleteTextView
+    lateinit var textID: TextView
+    lateinit var textName: TextView
+    lateinit var textAddress: TextView
+    lateinit var textPhone: TextView
+    lateinit var editPoints: EditText
+    lateinit var buttonIssue: ImageView
+    lateinit var imageBack: ImageView
+    lateinit var llData: LinearLayout
+    /**Progress**/
+    var listUsers: ArrayList<com.vkc.loyaltyme.activity.issue_points.model.user_type.Data>? = null
+    var selectedId: String? = null
+    var myPoint = 0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_issue_points)
+        context = this
+        initialiseUI()
+        getMyPoints()
+    }
+
+    private fun getMyPoints() {
+        var myPointsMainResponse: MyPointsModel
+        var myPointsResponse: com.vkc.loyaltyme.activity.home.model.my_points.Response
+        if (UtilityMethods.checkInternet(context)){
+            ApiClient.getApiService().getMyPointsResponse(
+                PreferenceManager.getCustomerID(context),
+                PreferenceManager.getUserType(context)
+            ).enqueue(object : Callback<MyPointsModel> {
+                override fun onResponse(
+                    call: Call<MyPointsModel>,
+                    response: retrofit2.Response<MyPointsModel>
+                ) {
+                    if (response.body() != null){
+                        myPointsMainResponse = response.body()!!
+                        myPointsResponse = myPointsMainResponse.response
+                        Log.e("Response",myPointsResponse.toString())
+                        if (myPointsResponse.status.equals("Success")){
+                            val points = myPointsResponse.loyality_point
+                            myPoint = points.toInt()
+                            /**
+                             * Set point to progress**/
+//                            arcProgress.setProgress(myPoint)
+                            getUsers()
+                        }else{
+                            CustomToast.customToast(context)
+                            CustomToast.show(0)
+                        }
+                    }else{
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
+                    }
+                }
+
+                override fun onFailure(call: Call<MyPointsModel>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }else{
+            CustomToast.customToast(context)
+            CustomToast.show(58)
+        }
+    }
+
+    private fun getUsers() {
+        var typeMainResponse: TypeModel
+        var typeResponse: com.vkc.loyaltyme.activity.issue_points.model.user_type.Response
+        var typeData: ArrayList<com.vkc.loyaltyme.activity.issue_points.model.user_type.Data>
+        var tempModel: com.vkc.loyaltyme.activity.issue_points.model.user_type.Data
+        if (UtilityMethods.checkInternet(context)){
+            ApiClient.getApiService().getUserType(
+                PreferenceManager.getUserType(context)
+            ).enqueue(object : Callback<TypeModel>{
+                override fun onResponse(
+                    call: Call<TypeModel>,
+                    response: retrofit2.Response<TypeModel>
+                ) {
+                    if (response != null){
+                        typeMainResponse = response.body()!!
+                        typeResponse = typeMainResponse.response
+                        if (typeResponse.status.equals("Success")){
+                            typeData = typeResponse.data
+                            if (typeData.size > 0){
+                                tempModel =
+                                    com.vkc.loyaltyme.activity.issue_points.model.user_type.Data("","")
+                                for (i in typeData.indices){
+                                    tempModel.id = typeData[i].id
+                                    tempModel.name = typeData[i].name
+                                    listUsers!!.add(tempModel)
+                                }
+                                val listUser = ArrayList<String>()
+                                for (i in listUsers!!.indices) {
+                                    listUser.add(
+                                        listUsers!![i].name
+                                    )
+                                }
+
+                                val adapter = ArrayAdapter(
+                                    context,
+                                    android.R.layout.simple_list_item_1,
+                                    listUser
+                                )
+                                autoSearch.threshold = 1
+                                autoSearch.setAdapter<ArrayAdapter<String>>(adapter)
+                            }
+                        }else{
+                            CustomToast.customToast(context)
+                            CustomToast.show(0)
+                        }
+                    }else{
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
+                    }
+                }
+
+                override fun onFailure(call: Call<TypeModel>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }else{
+            CustomToast.customToast(context)
+            CustomToast.show(58)
+        }
+    }
+
+    private fun initialiseUI() {
+        header = findViewById(R.id.header)
+        autoSearch = findViewById(R.id.autoSearch)
+        textID = findViewById(R.id.textViewId)
+        textName = findViewById(R.id.textViewName)
+        textAddress = findViewById(R.id.textViewAddress)
+        textPhone = findViewById(R.id.textViewPhone)
+        editPoints = findViewById(R.id.editPoints)
+        buttonIssue = findViewById(R.id.buttonIssue)
+        llData = findViewById(R.id.llData)
+        /**Progress**/
+        headerManager =
+            HeaderManager(this@IssuePointsActivity,
+                resources.getString(R.string.issue_point))
+        headerManager.getHeader(header, 1)
+        imageBack = headerManager.leftButton!!
+        headerManager.setButtonLeftSelector(
+            R.drawable.back,
+            R.drawable.back
+        )
+        imageBack.setOnClickListener {
+
+        }
+        buttonIssue.setOnClickListener {
+            if (autoSearch.text.toString().trim { it <= ' ' } == "") {
+                CustomToast.customToast(context)
+                CustomToast.show(14)
+            } else if (editPoints.text.toString().trim { it <= ' ' } == "") {
+                CustomToast.customToast(context)
+                CustomToast.show(17)
+            } else if (editPoints.text.toString().trim { it <= ' ' }.toInt() > myPoint) {
+                CustomToast.customToast(context)
+                CustomToast.show(16)
+            } else {
+                submitPoints()
+            }
+        }
+        autoSearch.onItemClickListener = OnItemClickListener { arg0, arg1, arg2, arg3 ->
+            val selectedData: String = autoSearch.text.toString()
+            for (i in listUsers!!.indices) {
+                if (listUsers!![i].name.equals(selectedData)) {
+                    selectedId = listUsers!![i].id
+                    getUserData()
+                    //   System.out.println("Selected Id : " + selectedId);
+                    break
+                } else {
+                    selectedId = ""
+                }
+            }
+        }
+        autoSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.isNotEmpty()) {
+                    if (selectedId!!.isNotEmpty()) {
+                        llData.visibility = View.VISIBLE
+                    }
+                } else {
+                    selectedId = ""
+                    llData.visibility = View.GONE
+                }
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+//        autoSearch.setOnTouchListener(OnTouchListener { v, event ->
+//            autoSearch.showDropDown()
+//            false
+//        })
+        autoSearch.setOnClickListener {
+            autoSearch.showDropDown()
+        }
+    }
+
+    private fun submitPoints() {
+        var submitPointsResponse: SubmitPointsResponse
+        if (UtilityMethods.checkInternet(context)){
+            ApiClient.getApiService().getSubmitPointsResponse(
+                PreferenceManager.getCustomerID(context),
+                selectedId.toString(),
+                "5",
+                editPoints.text.toString(),
+                "7"
+            ).enqueue(object : Callback<SubmitPointsResponse>{
+                override fun onResponse(
+                    call: Call<SubmitPointsResponse>,
+                    response: retrofit2.Response<SubmitPointsResponse>
+                ) {
+                    submitPointsResponse = response.body()!!
+                    if (submitPointsResponse.response == 1){
+                        CustomToast.customToast(context)
+                        CustomToast.show(18)
+                        autoSearch.setText("")
+                        editPoints.setText("")
+                        getMyPoints()
+                    }else if (submitPointsResponse.response == 5){
+                        CustomToast.customToast(context)
+                        CustomToast.show(61)
+                    }else{
+                        CustomToast.customToast(context)
+                        CustomToast.show(13)
+                    }
+                }
+
+                override fun onFailure(call: Call<SubmitPointsResponse>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }else{
+            CustomToast.customToast(context)
+            CustomToast.show(58)
+        }
+    }
+
+    private fun getUserData() {
+        var userMainResponse: UserModel
+        var userResponse: Response
+        var userData: Data
+        if (UtilityMethods.checkInternet(context)){
+            ApiClient.getApiService().getUserResponse(
+                PreferenceManager.getCustomerID(context),
+                PreferenceManager.getUserType(context)
+            ).enqueue(object : Callback<UserModel>{
+                override fun onResponse(
+                    call: Call<UserModel>,
+                    response: retrofit2.Response<UserModel>
+                ) {
+                    if (response.body() != null){
+                        userMainResponse = response.body()!!
+                        userResponse = userMainResponse.response
+                        if (userResponse.status.equals("Success")){
+                            userData = userResponse.data
+                            val custId: String = userData.customer_id
+                            val address: String = userData.address
+                            val name: String = userData.name
+                            val phone: String = userData.phone
+                            textID.text = ": $custId"
+                            textName.text = ": $name"
+                            textAddress.text = ": $address"
+                            textPhone.text = ": $phone"
+                            llData.visibility = View.VISIBLE
+                        }else{
+                            CustomToast.customToast(context)
+                            CustomToast.show(0)
+                        }
+                    }else{
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
+                    }
+                }
+
+                override fun onFailure(call: Call<UserModel>, t: Throwable) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }else{
+            CustomToast.customToast(context)
+            CustomToast.show(58)
+        }
+    }
+}

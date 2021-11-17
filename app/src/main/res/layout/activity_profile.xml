@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/loginbg"
+    tools:context=".activity.profile.ProfileActivity">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/headerConstraint"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintVertical_weight="0.30">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageProfile"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:padding="5dp"
+            android:src="@drawable/profile_image"
+            app:civ_border_color="#FFffffff"
+            app:civ_border_width="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.vkc.loyaltyme.manager.CustomTextViewWhite
+            android:id="@+id/textCustId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageProfile"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/cust_id"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageProfile" />
+
+        <com.vkc.loyaltyme.manager.CustomTextViewWhite
+            android:id="@+id/textMydealers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="10dp"
+            android:drawableTop="@drawable/mycustomers"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/assign_dealers"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/details"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerConstraint"
+        app:layout_constraintVertical_weight="0.70">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                        android:id="@+id/editMobile"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight=".80"
+                        android:background="@drawable/rounded_line_small"
+                        android:hint="@string/mobile"
+                        android:inputType="phone"
+                        android:maxLength="10"
+                        android:paddingStart="15dp"
+                        android:paddingEnd="15dp"
+                        android:singleLine="true"
+                        android:textCursorDrawable="@null"
+                        android:textSize="14sp" />
+
+                    <com.vkc.loyaltyme.manager.CustomTextViewWhite
+                        android:id="@+id/textUpdate"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight=".18"
+                        android:background="@drawable/rounded_line_small"
+                        android:gravity="center"
+
+                        android:text="@string/update"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editOwner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/owner_name"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editShop"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/shop_name"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small_radius"
+                    android:gravity="start|top"
+                    android:hint="@string/address"
+                    android:padding="15dp"
+                    android:singleLine="false"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editState"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/state"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editDistrict"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/district"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editPlace"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/place"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editPin"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/pin"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editMobile2"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/alternate_mobile"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="14sp" />
+
+                <com.vkc.loyaltyme.manager.CustomEditTextWhite
+                    android:id="@+id/editEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/rounded_line_small"
+                    android:hint="@string/email"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+                <Button
+                    android:id="@+id/buttonUpdate"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/rounded_rect_line"
+                    android:text="@string/update"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
