@@ -8,6 +8,7 @@ import com.vkc.loyaltyme.activity.common.model.state.StateResponseModel
 import com.vkc.loyaltyme.activity.common.model.user_details.UserDetailsResponseModel
 import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
 import com.vkc.loyaltyme.activity.dealers.model.dealers.DealersModel
+import com.vkc.loyaltyme.activity.dealers.model.submit.SubmitDealersModel
 import com.vkc.loyaltyme.activity.home.model.app_version.AppVersionModel
 import com.vkc.loyaltyme.activity.home.model.device_registration.DeviceRegistrationModel
 import com.vkc.loyaltyme.activity.home.model.my_points.MyPointsModel
@@ -15,12 +16,15 @@ import com.vkc.loyaltyme.activity.inbox.model.notification.NotificationModel
 import com.vkc.loyaltyme.activity.issue_points.model.submit_points.SubmitPointsResponse
 import com.vkc.loyaltyme.activity.issue_points.model.user.UserModel
 import com.vkc.loyaltyme.activity.issue_points.model.user_type.TypeModel
+import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionModel
 import com.vkc.loyaltyme.activity.profile.model.profile.ProfileModel
 import com.vkc.loyaltyme.activity.profile.model.update_phone.UpdatePhoneModel
 import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.*
+
 
 interface ApiService {
 
@@ -34,7 +38,7 @@ interface ApiService {
     ): Call<DistrictResponseModel>
 
     @FormUrlEncoded
-    @POST("getuserdetailswithMobileUAE")
+    @POST("getuserdetailswithMobile")
     fun getUserDetailsResponse(
         @Field("mobile") mobileNo: String,
         @Field("customer_id") customerID: String,
@@ -112,6 +116,14 @@ interface ApiService {
     ): Call<DealersModel>
 
     @FormUrlEncoded
+    @POST("assignDealers")
+    fun getSubmitDealersResponse(
+        @Field("cust_id") customerID: String,
+        @Field("role") role: String,
+        @Field("dealer_id") dealerID: String
+    ): Call<SubmitDealersModel>
+
+    @FormUrlEncoded
     @POST("phoneUpdateOTP")
     fun getPhoneUpdateResponse(
         @Field("cust_id") customerID: String,
@@ -155,4 +167,27 @@ interface ApiService {
         @Field("points") points: String,
         @Field("role") role: String
     ): Call<SubmitPointsResponse>
+
+    @FormUrlEncoded
+    @POST("transaction_history")
+    fun getTransactionHistoryResponse(
+        @Field("userid") customerID: String,
+        @Field("role") role: String,
+        @Field("type") type: String
+    ): Call<TransactionModel>
+
+    @Multipart
+    @POST("profile_updation")
+    fun updateProfile(
+     @Part("cust_id") customerID: RequestBody,
+     @Part("role") role: RequestBody,
+     @Part("phone") phone: RequestBody,
+     @Part("contact_person") owner: RequestBody,
+     @Part("city") city: RequestBody,
+     @Part("phone2") phone2: RequestBody,
+     @Part("email") email: RequestBody
+    ): Call<ResponseBody>
+
+
+
 }

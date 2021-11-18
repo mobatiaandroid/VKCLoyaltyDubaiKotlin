@@ -6,12 +6,14 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.vkc.loyaltyme.R
+import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.app_controller.AppController
 import com.vkc.loyaltyme.manager.HeaderManager
 
@@ -40,6 +42,7 @@ class InboxDetailsActivity : AppCompatActivity() {
         val intent = intent
         position =
             intent.extras!!.getInt("position")
+        Log.e("here",position.toString())
         initialiseUI()
 
     }
@@ -54,9 +57,12 @@ class InboxDetailsActivity : AppCompatActivity() {
             R.drawable.back,
             R.drawable.back
         )
-        textTitle = findViewById<View>(R.id.textTitle) as TextView
-        imageNotification = findViewById<View>(R.id.imageNotification) as ImageView
-        webMessage = findViewById<View>(R.id.webMessage) as WebView
+        textTitle = findViewById(R.id.textTitle)
+        textPinch = findViewById(R.id.textPinch)
+        imageNotification = findViewById(R.id.imageNotification)
+        webMessage = findViewById(R.id.webMessage)
+        webImage = findViewById(R.id.webImage)
+
         message = AppController.notificationsList[position].message
         image = AppController.notificationsList[position].image
         title = AppController.notificationsList[position].title
@@ -82,8 +88,12 @@ class InboxDetailsActivity : AppCompatActivity() {
         }
         textTitle.text = title
         val summary = "<html><body style=\"color:white;\">$message</body></html>"
-        webImage.setBackgroundColor(Color.TRANSPARENT)
-        webImage.loadData(summary, "text/html", null)
-
+        webMessage.setBackgroundColor(Color.TRANSPARENT)
+        webMessage.loadData(summary, "text/html", null)
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(context, InboxActivity::class.java)
+        startActivity(intent)
     }
 }

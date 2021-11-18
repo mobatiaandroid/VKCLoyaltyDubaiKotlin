@@ -45,4 +45,5 @@
     <string name="pin">Pin</string>
     <string name="alternate_mobile">Alternate Mobile</string>
     <string name="email">Email</string>
+    <string name="i_agree">I Agree</string>
 </resources>

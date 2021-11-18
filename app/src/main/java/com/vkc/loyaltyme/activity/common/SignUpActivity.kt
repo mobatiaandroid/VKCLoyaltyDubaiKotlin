@@ -2,7 +2,6 @@ package com.vkc.loyaltyme.activity.common
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -39,6 +38,7 @@ import com.vkc.loyaltyme.activity.common.model.register.RegisterModel
 import com.vkc.loyaltyme.activity.common.model.resend_otp.ResendOTPModel
 import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
 import com.vkc.loyaltyme.activity.home.HomeActivity
+import com.vkc.loyaltyme.utils.ProgressBarDialog
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -71,6 +71,7 @@ class SignUpActivity : AppCompatActivity() {
     lateinit var listUserType: ArrayList<String>
     lateinit var stateList: ArrayList<State>
     lateinit var districtList: ArrayList<com.vkc.loyaltyme.activity.common.model.district.Response>
+    lateinit var progressBar: ProgressBarDialog
     var otpValue = ""
     var androidID = ""
     var isNewReg = false
@@ -90,8 +91,7 @@ class SignUpActivity : AppCompatActivity() {
         stateList = ArrayList()
         districtList = ArrayList()
         district = ""
-
-
+        progressBar = ProgressBarDialog(context)
         listUserType = ArrayList()
         buttonRegister = findViewById<View>(R.id.buttonRegister) as Button
         editMobile = findViewById<View>(R.id.editMobile) as EditText
@@ -106,8 +106,8 @@ class SignUpActivity : AppCompatActivity() {
         editPlace = findViewById<View>(R.id.editPlace) as EditText
         editPin = findViewById<View>(R.id.editPin) as EditText
         editCustomer = findViewById<View>(R.id.editCustId) as EditText
-        imageSearch = findViewById<View>(R.id.imageSearch) as ImageView
-        imageGetData = findViewById<View>(R.id.imageFetchData) as ImageView
+        imageSearch = findViewById<View>(R.id.imageSearchID) as ImageView
+        imageGetData = findViewById<View>(R.id.imageGetData) as ImageView
         llCustomerID = findViewById<View>(R.id.llCustId) as ConstraintLayout
         llAddress = findViewById<View>(R.id.llAddress) as LinearLayout
         llUserType = findViewById<View>(R.id.llUserType) as LinearLayout
@@ -129,10 +129,20 @@ class SignUpActivity : AppCompatActivity() {
         Log.e("AndroidID", androidID)
 
         imageSearch.setOnClickListener {
-            getData()
+            if (editCustomer.text.toString().trim { it <= ' '} == "")  {
+                editCustomer.requestFocus()
+                editCustomer.error = "Mandatory Field"
+            }else{
+                getData()
+            }
         }
         imageGetData.setOnClickListener {
-            getData()
+            if (editMobile.text.toString().trim { it <= ' '} == "")  {
+                editMobile.requestFocus()
+                editMobile.error = "Mandatory Field"
+            }else{
+                getData()
+            }
         }
         buttonRegister.setOnClickListener {
             if (editMobile.text.toString().trim { it <= ' ' } == "") {
@@ -287,14 +297,14 @@ class SignUpActivity : AppCompatActivity() {
         var stateResponse: StateResponseModel
         var i = 0
         if (UtilityMethods.checkInternet(context)) {
+            progressBar.show()
             ApiClient.getApiService().getStateResponse()
                 .enqueue(object : Callback<StateResponseModel> {
                     override fun onResponse(
                         call: Call<StateResponseModel>,
                         response: Response<StateResponseModel>
                     ) {
-
-                        Log.e("Response", response.body().toString())
+                        progressBar.hide()
                         stateResponse = response.body()!!
                         while (i < stateResponse.states.size) {
                             stateList.add(stateResponse.states[i])
@@ -315,7 +325,9 @@ class SignUpActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<StateResponseModel>, t: Throwable) {
-                        TODO("Not yet implemented")
+                        progressBar.hide()
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
                     }
 
                 })
@@ -331,12 +343,14 @@ class SignUpActivity : AppCompatActivity() {
         var districtResponse: DistrictResponseModel
         var i = 0
         if (UtilityMethods.checkInternet(context)) {
+            progressBar.show()
             ApiClient.getApiService().getDistrictResponse(stateID)
                 .enqueue(object : Callback<DistrictResponseModel> {
                     override fun onResponse(
                         call: Call<DistrictResponseModel>,
                         response: Response<DistrictResponseModel>
                     ) {
+                        progressBar.hide()
                         districtResponse = response.body()!!
                         while (i < districtResponse.response.size) {
                             districtList.add(districtResponse.response[i])
@@ -364,7 +378,9 @@ class SignUpActivity : AppCompatActivity() {
                     }
 
                     override fun onFailure(call: Call<DistrictResponseModel>, t: Throwable) {
-                        TODO("Not yet implemented")
+                        progressBar.hide()
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
                     }
 
                 })
@@ -378,6 +394,7 @@ class SignUpActivity : AppCompatActivity() {
         var registerMainResponse: RegisterModel
         var registerResponse: com.vkc.loyaltyme.activity.common.model.register.Response
         if (UtilityMethods.checkInternet(context)) {
+            progressBar.show()
             ApiClient.getApiService().getRegisterResponse(
                 editMobile.text.toString().trim(),
                 PreferenceManager.getUserType(context),
@@ -389,6 +406,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<RegisterModel>,
                     response: Response<RegisterModel>
                 ) {
+                    progressBar.hide()
                     if (response.body() != null) {
                         registerMainResponse = response.body()!!
                         registerResponse = registerMainResponse.response
@@ -405,13 +423,15 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<RegisterModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
         } else {
             CustomToast.customToast(context)
-            CustomToast.show(0)
+            CustomToast.show(58)
         }
     }
 
@@ -420,6 +440,7 @@ class SignUpActivity : AppCompatActivity() {
         var newRegisterMainResponse: NewRegisterModel
         var newRegisterResponse: com.vkc.loyaltyme.activity.common.model.new_register.Response
         if (UtilityMethods.checkInternet(context)) {
+            progressBar.show()
             ApiClient.getApiService().getNewRegisterResponse(
                 editCustomer.text.toString(),
                 editShop.text.toString(),
@@ -438,6 +459,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<NewRegisterModel>,
                     response: Response<NewRegisterModel>
                 ) {
+                    progressBar.hide()
                     if (response.body() != null) {
                         newRegisterMainResponse = response.body()!!
                         newRegisterResponse = newRegisterMainResponse.response
@@ -464,24 +486,25 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<NewRegisterModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
         } else {
             CustomToast.customToast(context)
-            CustomToast.show(0)
+            CustomToast.show(58)
         }
     }
 
-
+    /**Get Data for  User**/
     private fun getData() {
         var userDetailsMainResponse: UserDetailsResponseModel
         var userDetailsResponse: com.vkc.loyaltyme.activity.common.model.user_details.Response
         var userDetails: Data
         if (UtilityMethods.checkInternet(context)) {
-            val dialog = ProgressDialog.show(context, "Loading", "Please Wait...")
-//            val dialog = ProgressBar(context)
+            progressBar.show()
             ApiClient.getApiService().getUserDetailsResponse(
                 editMobile.text.toString().trim(),
                 editCustomer.text.toString().trim(),
@@ -491,7 +514,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<UserDetailsResponseModel>,
                     response: Response<UserDetailsResponseModel>
                 ) {
-                    dialog.dismiss()
+                    progressBar.hide()
                     if (response.body() != null) {
                         Log.e("UserDetailsMainResponse", response.body().toString())
                         userDetailsMainResponse = response.body()!!
@@ -601,7 +624,9 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<UserDetailsResponseModel>, t: Throwable) {
-                    dialog.dismiss()
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -731,7 +756,7 @@ class SignUpActivity : AppCompatActivity() {
         var verifyOTPMainResponse: VerifyOTPModel
         var verifyOTPResponse: com.vkc.loyaltyme.activity.common.model.verify_otp.Response
         if (UtilityMethods.checkInternet(context)) {
-            val dialog = ProgressDialog.show(context,"Loading","Please Wait...")
+            progressBar.show()
             ApiClient.getApiService().getVerifyOTPResponse(
                 otpValue,
                 PreferenceManager.getUserType(context),
@@ -743,7 +768,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<VerifyOTPModel>,
                     response: Response<VerifyOTPModel>
                 ) {
-                    dialog.dismiss()
+                    progressBar.hide()
                     if (response.body() != null){
                         verifyOTPMainResponse = response.body()!!
                         verifyOTPResponse = verifyOTPMainResponse.response
@@ -790,7 +815,9 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<VerifyOTPModel>, t: Throwable) {
-                    dialog.dismiss()
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -829,6 +856,7 @@ class SignUpActivity : AppCompatActivity() {
         var updatePhoneMainResponse: VerifyOTPModel
         var updatePhoneResponse: com.vkc.loyaltyme.activity.common.model.verify_otp.Response
         if (UtilityMethods.checkInternet(context)) {
+            progressBar.show()
             ApiClient.getApiService().getVerifyOTPResponse(
                 otpValue,
                 PreferenceManager.getUserType(context),
@@ -840,6 +868,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<VerifyOTPModel>,
                     response: Response<VerifyOTPModel>
                 ) {
+                    progressBar.hide()
                     if (response.body() != null){
                         updatePhoneMainResponse = response.body()!!
                         updatePhoneResponse = updatePhoneMainResponse.response
@@ -864,7 +893,9 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<VerifyOTPModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -879,6 +910,7 @@ class SignUpActivity : AppCompatActivity() {
         var resendOTPMainResponse: ResendOTPModel
         var resendOTPResponse: com.vkc.loyaltyme.activity.common.model.resend_otp.Response
         if (UtilityMethods.checkInternet(context)){
+            progressBar.show()
             ApiClient.getApiService().getResendOTPResponse(
                 PreferenceManager.getUserType(context),
                 PreferenceManager.getCustomerID(context)
@@ -887,6 +919,7 @@ class SignUpActivity : AppCompatActivity() {
                     call: Call<ResendOTPModel>,
                     response: Response<ResendOTPModel>
                 ) {
+                    progressBar.hide()
                     if (response.body() != null){
                         resendOTPMainResponse = response.body()!!
                         resendOTPResponse = resendOTPMainResponse.response
@@ -904,7 +937,9 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ResendOTPModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBar.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })

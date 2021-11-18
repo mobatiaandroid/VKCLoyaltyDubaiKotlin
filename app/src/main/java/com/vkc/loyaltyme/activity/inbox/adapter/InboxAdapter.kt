@@ -2,18 +2,19 @@ package com.vkc.loyaltyme.activity.inbox.adapter
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.inbox.InboxDetailsActivity
 import com.vkc.loyaltyme.activity.inbox.model.notification.Data
+import kotlin.Exception
 
 class InboxAdapter(var context: Context, var notificationList: ArrayList<Data>)
     : RecyclerView.Adapter<InboxAdapter.ViewHolder>(){
@@ -48,12 +49,14 @@ class InboxAdapter(var context: Context, var notificationList: ArrayList<Data>)
             Glide.with(context).load(notificationList[position].image).into(holder.imageTile!!)
         }
         holder.itemView.setOnClickListener {
-            val intent = Intent(context, InboxDetailsActivity::class.java)
-            intent.putExtra("position", position)
-            startActivity(context,intent,null)
-
+            try{
+                val intent = Intent(context, InboxDetailsActivity::class.java)
+                intent.putExtra("position", position)
+                context.startActivity(intent)
+            }catch(e:Exception){
+                Log.e("Error", e.toString())
+            }
         }
-
     }
 
     override fun getItemCount(): Int {

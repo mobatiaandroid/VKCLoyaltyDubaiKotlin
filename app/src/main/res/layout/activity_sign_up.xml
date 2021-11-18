@@ -85,14 +85,14 @@
                     android:textCursorDrawable="@null"
                     android:textSize="14dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/imageFetchData"
+                    app:layout_constraintEnd_toStartOf="@+id/imageGetData"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="85"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/imageFetchData"
+                    android:id="@+id/imageGetData"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="4dp"
@@ -128,14 +128,14 @@
                     android:textCursorDrawable="@null"
                     android:textSize="14dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/imageSearch"
+                    app:layout_constraintEnd_toStartOf="@+id/imageSearchID"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintHorizontal_weight="85"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/imageSearch"
+                    android:id="@+id/imageSearchID"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="4dp"

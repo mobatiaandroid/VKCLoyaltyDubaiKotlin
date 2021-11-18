@@ -1,17 +1,19 @@
 package com.vkc.loyaltyme.activity.issue_points
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.speech.tts.UtteranceProgressListener
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
+import androidx.appcompat.app.AppCompatActivity
+import com.github.lzyzsd.circleprogress.ArcProgress
 import com.vkc.loyaltyapp.util.CustomToast
 import com.vkc.loyaltyme.R
+import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.activity.home.model.my_points.MyPointsModel
 import com.vkc.loyaltyme.activity.issue_points.model.submit_points.SubmitPointsResponse
 import com.vkc.loyaltyme.activity.issue_points.model.user.Data
@@ -21,10 +23,11 @@ import com.vkc.loyaltyme.activity.issue_points.model.user_type.TypeModel
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.manager.HeaderManager
 import com.vkc.loyaltyme.manager.PreferenceManager
+import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import retrofit2.Call
 import retrofit2.Callback
-import java.util.ArrayList
+import java.util.*
 
 class IssuePointsActivity : AppCompatActivity() {
     lateinit var context: Activity
@@ -39,7 +42,9 @@ class IssuePointsActivity : AppCompatActivity() {
     lateinit var buttonIssue: ImageView
     lateinit var imageBack: ImageView
     lateinit var llData: LinearLayout
-    /**Progress**/
+    lateinit var arcProgress: ArcProgress
+    lateinit var progressBarDialog: ProgressBarDialog
+    var sampleList = arrayListOf<String>("Dealer","Retailer","Sub-Dealer")
     var listUsers: ArrayList<com.vkc.loyaltyme.activity.issue_points.model.user_type.Data>? = null
     var selectedId: String? = null
     var myPoint = 0
@@ -50,11 +55,109 @@ class IssuePointsActivity : AppCompatActivity() {
         initialiseUI()
         getMyPoints()
     }
+    private fun initialiseUI() {
+        header = findViewById(R.id.header)
+        autoSearch = findViewById(R.id.autoSearch)
+        textID = findViewById(R.id.textViewId)
+        textName = findViewById(R.id.textViewName)
+        textAddress = findViewById(R.id.textViewAddress)
+        textPhone = findViewById(R.id.textViewPhone)
+        editPoints = findViewById(R.id.editPoints)
+        buttonIssue = findViewById(R.id.buttonIssue)
+        llData = findViewById(R.id.llData)
+        arcProgress = findViewById(R.id.arc_progress)
+        progressBarDialog = ProgressBarDialog(context)
+        headerManager =
+            HeaderManager(this@IssuePointsActivity,
+                resources.getString(R.string.issue_point))
+        headerManager.getHeader(header, 1)
+        imageBack = headerManager.leftButton!!
+        headerManager.setButtonLeftSelector(
+            R.drawable.back,
+            R.drawable.back
+        )
+        llData.visibility = View.GONE
+        arcProgress.suffixText = ""
+        arcProgress.strokeWidth = 15f
+        arcProgress.bottomTextSize = 50f
+        arcProgress.max = 10000000
+        autoSearch.setText(sampleList[0])
+        /***getColor deprecated***/
+        arcProgress.textColor = getColor(R.color.white)
+        arcProgress.setBackgroundColor(getColor(R.color.transparent))
+        arcProgress.unfinishedStrokeColor = getColor(R.color.white)
+        imageBack.setOnClickListener {
+            finish()
+        }
+        buttonIssue.setOnClickListener {
+            if (autoSearch.text.toString().trim { it <= ' ' } == "") {
+                CustomToast.customToast(context)
+                CustomToast.show(14)
+            } else if (editPoints.text.toString().trim { it <= ' ' } == "") {
+                CustomToast.customToast(context)
+                CustomToast.show(17)
+            } else if (editPoints.text.toString().trim { it <= ' ' }.toInt() > myPoint) {
+                CustomToast.customToast(context)
+                CustomToast.show(16)
+            } else {
+                submitPoints()
+            }
+        }
+
+        autoSearch.onItemClickListener = OnItemClickListener { _, _, _, _ ->
+            val selectedData: String = autoSearch.text.toString()
+            for (i in listUsers!!.indices) {
+                if (listUsers!![i].name.equals(selectedData)) {
+                    selectedId = listUsers!![i].id
+                    getUserData()
+                    break
+                } else {
+                    selectedId = ""
+                }
+            }
+        }
+
+
+        autoSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                if (s.isNotEmpty()) {
+                    Log.e("selected", selectedId.toString())
+                    if (selectedId!!.isNotEmpty()) {
+                        llData.visibility = View.VISIBLE
+                    }
+                } else {
+                    selectedId = ""
+                    llData.visibility = View.GONE
+                }
+            }
+
+            override fun afterTextChanged(s: Editable) {}
+        })
+
+        autoSearch.setOnTouchListener { _, _ ->
+            autoSearch.showDropDown()
+            false
+        }
+
+        autoSearch.setOnClickListener {
+            autoSearch.showDropDown()
+        }
+    }
+
 
     private fun getMyPoints() {
         var myPointsMainResponse: MyPointsModel
         var myPointsResponse: com.vkc.loyaltyme.activity.home.model.my_points.Response
         if (UtilityMethods.checkInternet(context)){
+            progressBarDialog.show()
             ApiClient.getApiService().getMyPointsResponse(
                 PreferenceManager.getCustomerID(context),
                 PreferenceManager.getUserType(context)
@@ -63,6 +166,7 @@ class IssuePointsActivity : AppCompatActivity() {
                     call: Call<MyPointsModel>,
                     response: retrofit2.Response<MyPointsModel>
                 ) {
+                    progressBarDialog.hide()
                     if (response.body() != null){
                         myPointsMainResponse = response.body()!!
                         myPointsResponse = myPointsMainResponse.response
@@ -70,9 +174,7 @@ class IssuePointsActivity : AppCompatActivity() {
                         if (myPointsResponse.status.equals("Success")){
                             val points = myPointsResponse.loyality_point
                             myPoint = points.toInt()
-                            /**
-                             * Set point to progress**/
-//                            arcProgress.setProgress(myPoint)
+                            arcProgress.progress = myPoint
                             getUsers()
                         }else{
                             CustomToast.customToast(context)
@@ -85,7 +187,9 @@ class IssuePointsActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<MyPointsModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBarDialog.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -101,6 +205,7 @@ class IssuePointsActivity : AppCompatActivity() {
         var typeData: ArrayList<com.vkc.loyaltyme.activity.issue_points.model.user_type.Data>
         var tempModel: com.vkc.loyaltyme.activity.issue_points.model.user_type.Data
         if (UtilityMethods.checkInternet(context)){
+            progressBarDialog.show()
             ApiClient.getApiService().getUserType(
                 PreferenceManager.getUserType(context)
             ).enqueue(object : Callback<TypeModel>{
@@ -108,6 +213,7 @@ class IssuePointsActivity : AppCompatActivity() {
                     call: Call<TypeModel>,
                     response: retrofit2.Response<TypeModel>
                 ) {
+                    progressBarDialog.hide()
                     if (response != null){
                         typeMainResponse = response.body()!!
                         typeResponse = typeMainResponse.response
@@ -147,7 +253,9 @@ class IssuePointsActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<TypeModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBarDialog.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -157,83 +265,11 @@ class IssuePointsActivity : AppCompatActivity() {
         }
     }
 
-    private fun initialiseUI() {
-        header = findViewById(R.id.header)
-        autoSearch = findViewById(R.id.autoSearch)
-        textID = findViewById(R.id.textViewId)
-        textName = findViewById(R.id.textViewName)
-        textAddress = findViewById(R.id.textViewAddress)
-        textPhone = findViewById(R.id.textViewPhone)
-        editPoints = findViewById(R.id.editPoints)
-        buttonIssue = findViewById(R.id.buttonIssue)
-        llData = findViewById(R.id.llData)
-        /**Progress**/
-        headerManager =
-            HeaderManager(this@IssuePointsActivity,
-                resources.getString(R.string.issue_point))
-        headerManager.getHeader(header, 1)
-        imageBack = headerManager.leftButton!!
-        headerManager.setButtonLeftSelector(
-            R.drawable.back,
-            R.drawable.back
-        )
-        imageBack.setOnClickListener {
-
-        }
-        buttonIssue.setOnClickListener {
-            if (autoSearch.text.toString().trim { it <= ' ' } == "") {
-                CustomToast.customToast(context)
-                CustomToast.show(14)
-            } else if (editPoints.text.toString().trim { it <= ' ' } == "") {
-                CustomToast.customToast(context)
-                CustomToast.show(17)
-            } else if (editPoints.text.toString().trim { it <= ' ' }.toInt() > myPoint) {
-                CustomToast.customToast(context)
-                CustomToast.show(16)
-            } else {
-                submitPoints()
-            }
-        }
-        autoSearch.onItemClickListener = OnItemClickListener { arg0, arg1, arg2, arg3 ->
-            val selectedData: String = autoSearch.text.toString()
-            for (i in listUsers!!.indices) {
-                if (listUsers!![i].name.equals(selectedData)) {
-                    selectedId = listUsers!![i].id
-                    getUserData()
-                    //   System.out.println("Selected Id : " + selectedId);
-                    break
-                } else {
-                    selectedId = ""
-                }
-            }
-        }
-        autoSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (s.isNotEmpty()) {
-                    if (selectedId!!.isNotEmpty()) {
-                        llData.visibility = View.VISIBLE
-                    }
-                } else {
-                    selectedId = ""
-                    llData.visibility = View.GONE
-                }
-            }
-
-            override fun afterTextChanged(s: Editable) {}
-        })
-//        autoSearch.setOnTouchListener(OnTouchListener { v, event ->
-//            autoSearch.showDropDown()
-//            false
-//        })
-        autoSearch.setOnClickListener {
-            autoSearch.showDropDown()
-        }
-    }
 
     private fun submitPoints() {
         var submitPointsResponse: SubmitPointsResponse
         if (UtilityMethods.checkInternet(context)){
+            progressBarDialog.show()
             ApiClient.getApiService().getSubmitPointsResponse(
                 PreferenceManager.getCustomerID(context),
                 selectedId.toString(),
@@ -245,6 +281,7 @@ class IssuePointsActivity : AppCompatActivity() {
                     call: Call<SubmitPointsResponse>,
                     response: retrofit2.Response<SubmitPointsResponse>
                 ) {
+                    progressBarDialog.hide()
                     submitPointsResponse = response.body()!!
                     if (submitPointsResponse.response == 1){
                         CustomToast.customToast(context)
@@ -262,7 +299,9 @@ class IssuePointsActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<SubmitPointsResponse>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBarDialog.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -277,6 +316,7 @@ class IssuePointsActivity : AppCompatActivity() {
         var userResponse: Response
         var userData: Data
         if (UtilityMethods.checkInternet(context)){
+            progressBarDialog.show()
             ApiClient.getApiService().getUserResponse(
                 PreferenceManager.getCustomerID(context),
                 PreferenceManager.getUserType(context)
@@ -285,6 +325,7 @@ class IssuePointsActivity : AppCompatActivity() {
                     call: Call<UserModel>,
                     response: retrofit2.Response<UserModel>
                 ) {
+                    progressBarDialog.hide()
                     if (response.body() != null){
                         userMainResponse = response.body()!!
                         userResponse = userMainResponse.response
@@ -310,7 +351,9 @@ class IssuePointsActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<UserModel>, t: Throwable) {
-                    TODO("Not yet implemented")
+                    progressBarDialog.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
                 }
 
             })
@@ -318,5 +361,10 @@ class IssuePointsActivity : AppCompatActivity() {
             CustomToast.customToast(context)
             CustomToast.show(58)
         }
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(context, HomeActivity::class.java)
+        startActivity(intent)
     }
 }

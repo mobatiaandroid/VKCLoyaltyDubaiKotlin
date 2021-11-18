@@ -5,8 +5,8 @@ data class Data(
     var from_date: String,
     var image: String,
     var message: String,
-    val notification_type: String,
-    val pdf: String,
+    var notification_type: String,
+    var pdf: String,
     var title: String,
     var to_date: String
 )
