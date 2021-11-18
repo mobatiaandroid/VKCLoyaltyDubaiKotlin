@@ -653,23 +653,17 @@ class SignUpActivity : AppCompatActivity() {
         }
         buttonCancel.setOnClickListener {
             dialog.dismiss()
-            // mActivity.finish();
             if (type == "1") {
                 editCustomer.setText("")
             } else if (type == "2") {
                 editCustomer.setText("")
-                //   dismiss();
                 startActivity(Intent(context, SignUpActivity::class.java))
             } else if (type == "3") {
-                //  dismiss();
                 startActivity(Intent(context, DealersActivity::class.java))
             } else if (type == "4") {
-                // dismiss();
             } else if (type == "5") {
-                //  dismiss();
             } else {
                 llUserType.visibility = View.VISIBLE
-                // dismiss();
             }
         }
         okButton.setOnClickListener {
@@ -726,13 +720,9 @@ class SignUpActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         editOTP4.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
                 if (s!!.length == 1){
@@ -745,10 +735,7 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 }
             }
-
         })
-
-
         dialog.show()
     }
 
@@ -954,7 +941,6 @@ class SignUpActivity : AppCompatActivity() {
         View.OnKeyListener {
         override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
             if (event!!.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DEL && currentView.id != R.id.editOtp1 && currentView.text.isEmpty()) {
-                //If current is empty then previous EditText's number will also be deleted
                 previousView!!.text = null
                 previousView.requestFocus()
                 return true
@@ -1007,9 +993,6 @@ class SignUpActivity : AppCompatActivity() {
                     }
                 }
             }
-
-
         }
-
     }
 }
