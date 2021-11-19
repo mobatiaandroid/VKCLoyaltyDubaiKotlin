@@ -31,7 +31,7 @@
                 android:layout_width="50dip"
                 android:layout_height="50dip"
                 android:layout_gravity="center"
-                android:visibility="gone" />
+                android:visibility="invisible" />
 
         </LinearLayout>
 
@@ -55,7 +55,7 @@
                     android:layout_height="0dp"
                     android:layout_weight=".50"
                     android:gravity="center|start"
-                    android:text="Message Title"
+                    android:text="@string/message_title"
                     android:textSize="12sp" />
 
                 <com.vkc.loyaltyme.manager.CustomTextViewBlack

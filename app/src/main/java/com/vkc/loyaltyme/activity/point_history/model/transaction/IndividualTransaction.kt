@@ -1,6 +1,6 @@
 package com.vkc.loyaltyme.activity.point_history.model.transaction
 
-data class Details(
+data class IndividualTransaction(
     var points: String,
     var type: String,
     var to_name: String,

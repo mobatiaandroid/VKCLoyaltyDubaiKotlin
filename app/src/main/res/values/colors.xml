@@ -10,5 +10,7 @@
     <color name="transparent">#00000000</color>
     <color name="magenta_haze">#9D4272</color>
     <color name="cyclamen">#fb7c9e</color>
+    <color name="list_row_color_white">#ffffff</color>
+    <color name="list_row_color_grey">#e1e1e1</color>
 
 </resources>

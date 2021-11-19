@@ -253,7 +253,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun getVersion(): String? {
-        var packageInfo: PackageInfo = packageManager.getPackageInfo(
+        val packageInfo: PackageInfo = packageManager.getPackageInfo(
             packageName, 0
         )
         return packageInfo.versionName

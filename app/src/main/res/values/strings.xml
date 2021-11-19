@@ -17,6 +17,7 @@
     <string name="notification_channel_id">default</string>
     <string name="title_activity_dealers">DealersActivity</string>
     <string name="otp_sent">OTP has been sent to XXXXXXXXX%1$s</string>
+    <string name="total_coupons">%1$s Coupons</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
@@ -46,4 +47,5 @@
     <string name="alternate_mobile">Alternate Mobile</string>
     <string name="email">Email</string>
     <string name="i_agree">I Agree</string>
+    <string name="message_title">Message Title</string>
 </resources>

@@ -2,7 +2,6 @@ package com.vkc.loyaltyme.activity.dealers
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vkc.loyaltyapp.util.CustomToast
@@ -21,7 +21,6 @@ import com.vkc.loyaltyme.activity.dealers.model.dealers.DealersModel
 import com.vkc.loyaltyme.activity.dealers.model.dealers.Response
 import com.vkc.loyaltyme.activity.dealers.model.submit.SubmitDealersModel
 import com.vkc.loyaltyme.activity.home.HomeActivity
-import com.vkc.loyaltyme.activity.issue_points.model.submit_points.SubmitPointsResponse
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.app_controller.AppController
 import com.vkc.loyaltyme.manager.HeaderManager
@@ -29,7 +28,6 @@ import com.vkc.loyaltyme.manager.PreferenceManager
 import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback

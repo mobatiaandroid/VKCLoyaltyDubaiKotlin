@@ -11,11 +11,10 @@ import com.vkc.loyaltyapp.util.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.activity.point_history.adapter.TransactionHistoryAdapter
-import com.vkc.loyaltyme.activity.point_history.model.transaction.Data
-import com.vkc.loyaltyme.activity.point_history.model.transaction.Details
 import com.vkc.loyaltyme.activity.point_history.model.transaction.Response
 import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionModel
 import com.vkc.loyaltyme.api.ApiClient
+import com.vkc.loyaltyme.app_controller.AppController
 import com.vkc.loyaltyme.manager.HeaderManager
 import com.vkc.loyaltyme.manager.PreferenceManager
 import com.vkc.loyaltyme.utils.ProgressBarDialog
@@ -86,9 +85,7 @@ class PointHistoryActivity : AppCompatActivity() {
         textDebit.setOnClickListener {
             historyType = "DEBIT"
 
-            val adapter = TransactionHistoryAdapter(
-                context, listHistory
-            )
+            val adapter = TransactionHistoryAdapter()
             listViewHistory.setAdapter(adapter)
             textCredit.setBackgroundResource(R.drawable.rounded_rect_redline)
             textDebit.setBackgroundResource(R.drawable.rounded_rect_green)
@@ -98,9 +95,7 @@ class PointHistoryActivity : AppCompatActivity() {
             historyType = "CREDIT"
             textCredit.setBackgroundResource(R.drawable.rounded_rect_green)
             textDebit.setBackgroundResource(R.drawable.rounded_rect_redline)
-            val adapter = TransactionHistoryAdapter(
-                context, listHistory
-            )
+            val adapter = TransactionHistoryAdapter()
             listViewHistory.setAdapter(adapter)
             getHistory()
         }
@@ -130,8 +125,6 @@ class PointHistoryActivity : AppCompatActivity() {
     private fun getHistory() {
         var transactionMainResponse: TransactionModel
         var transactionResponse: Response
-        var transactionData: ArrayList<Data> = ArrayList()
-        var transactionDetails: Details
         if (UtilityMethods.checkInternet(context)){
             progressBarDialog.show()
             ApiClient.getApiService().getTransactionHistoryResponse(
@@ -154,11 +147,15 @@ class PointHistoryActivity : AppCompatActivity() {
                     if (transactionResponse.status.equals("Success")){
                         if (transactionResponse.data.size > 0){
                             for (i in transactionResponse.data.indices) {
-                                transactionData.add(transactionResponse.data[i])
+                                AppController.transactionData.add(transactionResponse.data[i])
                             }
-                            for (i in transactionData.indices){
-                                /**** Here ****/
+                            for (i in AppController.transactionData.indices){
+                                for (j in AppController.transactionData[i].details.indices){
+                                    AppController.transactionDetails.add(AppController.transactionData[i].details[j])
+                                }
                             }
+                            val adapter = TransactionHistoryAdapter()
+                            listViewHistory.setAdapter(adapter)
                         }
                     }else{
 
