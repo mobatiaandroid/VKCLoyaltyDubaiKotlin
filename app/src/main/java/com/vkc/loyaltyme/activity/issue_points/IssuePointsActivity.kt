@@ -11,7 +11,7 @@ import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import androidx.appcompat.app.AppCompatActivity
 import com.github.lzyzsd.circleprogress.ArcProgress
-import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.activity.home.model.my_points.MyPointsModel
@@ -206,7 +206,7 @@ class IssuePointsActivity : AppCompatActivity() {
         var tempModel: com.vkc.loyaltyme.activity.issue_points.model.user_type.Data
         if (UtilityMethods.checkInternet(context)){
             progressBarDialog.show()
-            ApiClient.getApiService().getUserType(
+            ApiClient.getApiService().getRetailersResponse(
                 PreferenceManager.getUserType(context)
             ).enqueue(object : Callback<TypeModel>{
                 override fun onResponse(

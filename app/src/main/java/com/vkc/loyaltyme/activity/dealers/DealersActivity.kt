@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.dealers.adapter.DealersListAdapter
 import com.vkc.loyaltyme.activity.dealers.model.dealers.Data

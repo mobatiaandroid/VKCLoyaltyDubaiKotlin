@@ -20,7 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.google.firebase.messaging.FirebaseMessaging
-import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.home.model.app_version.AppVersionModel
 import com.vkc.loyaltyme.activity.home.model.device_registration.DeviceRegistrationModel
@@ -188,9 +188,9 @@ class HomeActivity : AppCompatActivity() {
             .setMessage("Please update the app to avail new features") //
             .setPositiveButton("Ok") { _, _ ->
                 try {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)))
-                } catch (anfe: ActivityNotFoundException) {
-                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)))
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
+                } catch (exception: ActivityNotFoundException) {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")))
                 }
             }
 
@@ -211,6 +211,7 @@ class HomeActivity : AppCompatActivity() {
             val token = task.result
             PreferenceManager.setToken(context, token)
         })
+        Log.e("Token", PreferenceManager.getToken(context))
         if (UtilityMethods.checkInternet(context)) {
             progressBarDialog.show()
             ApiClient.getApiService().getDeviceRegistrationResponse(

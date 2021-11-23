@@ -4,15 +4,13 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
@@ -24,8 +22,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
-import com.vansuita.pickimage.dialog.PickImageDialog
-import com.vkc.loyaltyapp.util.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.common.SignUpActivity
 import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
@@ -35,20 +31,20 @@ import com.vkc.loyaltyme.activity.profile.model.profile.Data
 import com.vkc.loyaltyme.activity.profile.model.profile.ProfileModel
 import com.vkc.loyaltyme.activity.profile.model.update_phone.Response
 import com.vkc.loyaltyme.activity.profile.model.update_phone.UpdatePhoneModel
+import com.vkc.loyaltyme.activity.profile.model.update_profile.UpdateProfileModel
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.manager.HeaderManager
 import com.vkc.loyaltyme.manager.PreferenceManager
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import okhttp3.MediaType
-import org.json.JSONObject
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import java.io.File
 import kotlin.math.roundToInt
-import okhttp3.RequestBody
-
-
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -74,8 +70,6 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var progressBarDialog: ProgressBarDialog
     var imageCaptureUri: Uri? = null
     var otpValue = ""
-    var activityRequestCode = 700
-    var activityFinishResultCode = 701
     var filePath = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,6 +100,7 @@ class ProfileActivity : AppCompatActivity() {
         headerManager.getHeader(header, 1)
         imageBack = headerManager.leftButton!!
 
+
         headerManager.setButtonLeftSelector(
             R.drawable.back,
             R.drawable.back
@@ -119,7 +114,7 @@ class ProfileActivity : AppCompatActivity() {
         editPin.isEnabled = false
         editAddress.isEnabled = false
         buttonUpdate.setOnClickListener {
-            uploadFile()
+            updateProfile()
         }
         textMyDealers.setOnClickListener {
             startActivity(
@@ -162,9 +157,6 @@ class ProfileActivity : AppCompatActivity() {
                     )
                 ) {
 
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
                     ActivityCompat.requestPermissions(
                         this@ProfileActivity,
                         arrayOf(
@@ -175,7 +167,7 @@ class ProfileActivity : AppCompatActivity() {
                     )
                 } else {
 
-                    // No explanation needed, we can request the permission.
+
                     ActivityCompat.requestPermissions(
                         this@ProfileActivity,
                         arrayOf(
@@ -184,9 +176,7 @@ class ProfileActivity : AppCompatActivity() {
                         ),
                         100
                     )
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
+
                 }
             } else {
                 showCameraGalleryChoice()
@@ -194,8 +184,62 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadFile() {
-        /**here**/
+    private fun updateProfile() {
+        var updateProfileMainResponse: UpdateProfileModel
+        var updateProfileResponse: com.vkc.loyaltyme.activity.profile.model.update_profile.Response
+        if (UtilityMethods.checkInternet(context)){
+            progressBarDialog.show()
+            Log.e("URI",imageCaptureUri.toString())
+            val file = File(filePath)
+            val requestFile: RequestBody =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file)
+            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            val customerID: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"),PreferenceManager.getCustomerID(context))
+            val role: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), PreferenceManager.getUserType(context))
+            val mobileNo: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editMobile.text.toString().trim())
+            val ownerName: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editOwner.text.toString().trim())
+            val place: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editPlace.text.toString().trim())
+            val mobileNo2: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editMobile2.text.toString().trim())
+            val email: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editEmail.text.toString().trim())
+            ApiClient.getApiService().getUpdateProfileResponse(
+                customerID,
+                role,
+                mobileNo,
+                ownerName,
+                place,
+                mobileNo2,
+                email,
+                body
+            ).enqueue(object : Callback<UpdateProfileModel> {
+                override fun onResponse(
+                    call: Call<UpdateProfileModel>,
+                    response: retrofit2.Response<UpdateProfileModel>,
+                ) {
+                    Log.e("Response",response.body().toString())
+                    progressBarDialog.hide()
+
+                    updateProfileMainResponse = response.body()!!
+                    updateProfileResponse = updateProfileMainResponse.response
+                    if (updateProfileResponse.status.equals("Success")){
+                        CustomToast.customToast(context)
+                        CustomToast.show(26)
+                    }else{
+                        CustomToast.customToast(context)
+                        CustomToast.show(27)
+                    }
+                }
+
+                override fun onFailure(call: Call<UpdateProfileModel>, t: Throwable) {
+                    progressBarDialog.hide()
+                    CustomToast.customToast(context)
+                    CustomToast.show(0)
+                }
+
+            })
+        }else{
+            CustomToast.customToast(context)
+            CustomToast.show(58)
+        }
     }
 
 
@@ -212,7 +256,7 @@ class ProfileActivity : AppCompatActivity() {
             ).enqueue(object : Callback<ProfileModel> {
                 override fun onResponse(
                     call: Call<ProfileModel>,
-                    response: retrofit2.Response<ProfileModel>
+                    response: retrofit2.Response<ProfileModel>,
                 ) {
                     progressBarDialog.hide()
                     if (response.body() != null) {
@@ -296,7 +340,7 @@ class ProfileActivity : AppCompatActivity() {
             ).enqueue(object : Callback<UpdatePhoneModel> {
                 override fun onResponse(
                     call: Call<UpdatePhoneModel>,
-                    response: retrofit2.Response<UpdatePhoneModel>
+                    response: retrofit2.Response<UpdatePhoneModel>,
                 ) {
                     progressBarDialog.hide()
                     if (response.body() != null) {
@@ -410,7 +454,7 @@ class ProfileActivity : AppCompatActivity() {
             ).enqueue(object : Callback<VerifyOTPModel> {
                 override fun onResponse(
                     call: Call<VerifyOTPModel>,
-                    response: retrofit2.Response<VerifyOTPModel>
+                    response: retrofit2.Response<VerifyOTPModel>,
                 ) {
                     progressBarDialog.hide()
                     if (response.body() != null) {
@@ -463,57 +507,22 @@ class ProfileActivity : AppCompatActivity() {
         ) { dialog, which ->
             when(which){
              0 -> {
-                 val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                 startActivityForResult(takePicture, 0)
+                 try{
+                     val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                     startActivityForResult(takePicture, 0)
+                 }catch (e: Exception){
+                     Log.e("Error",e.toString())
+                 }
              }
              1 -> {
                  val pickPhoto = Intent(Intent.ACTION_PICK,
                          MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                 val root = Environment.getExternalStorageDirectory().absolutePath
-                    val myDir = File(root + "/" + resources.getString(R.string.app_name))
-                    myDir.mkdirs()
-                    val file = File(
-                        myDir, "tmp_avatar_"
-                                + System.currentTimeMillis().toString() + ".JPEG"
-                    )
-                    imageCaptureUri = Uri.fromFile(file)
-                 pickPhoto.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureUri)
-                 pickPhoto.putExtra("return-data", true)
+
                  startActivityForResult(Intent.createChooser(pickPhoto,resources.getString(
                             R.string.select_item)), 1)
 
              }
             }
-//            if (which == 0) {
-//                try{
-//                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//                    val root = Environment.getExternalStorageDirectory().absolutePath
-//                    val myDir = File(root + "/" + resources.getString(R.string.app_name))
-//                    myDir.mkdirs()
-//                    val file = File(
-//                        myDir, "tmp_avatar_"
-//                                + System.currentTimeMillis().toString() + ".JPEG"
-//                    )
-//                    imageCaptureUri = Uri.fromFile(file)
-//                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureUri)
-//                    cameraIntent.putExtra("return-data", true)
-//                    startActivityForResult(cameraIntent, 0)
-//                }catch (e: Exception){
-//                    Log.e("Error",e.toString())
-//                }
-//
-//            } else if (which == 1) {
-//                val intent =
-//                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//                intent.type = "image/*"
-//                startActivityForResult(
-//                    Intent.createChooser(
-//                        intent, resources.getString(
-//                            R.string.select_item
-//                        )
-//                    ), 1
-//                )
-//            }
         }
         dialogGetImageFrom.show()
     }
@@ -525,59 +534,78 @@ class ProfileActivity : AppCompatActivity() {
 
             0 -> if (resultCode == RESULT_OK) {
                 val selectedImage: Uri? = data?.data
-                Log.e("selected", selectedImage.toString())
-                Glide.with(context).load(selectedImage).into(imageProfile)
-//                imageProfile.setImageURI(selectedImage)
+
+//                if (data !!.clipData != null) {
+//                    var count = data.clipData !!.itemCount
+//                    for (i in 0 until count) {
+//                        imageCaptureUri = data.clipData !!.getItemAt(i).uri
+//                        getPathFromURI(imageCaptureUri!!)
+//                    }
+//                } else if (data.data != null) {
+//                    filePath = data.data !!.path !!
+//                    Log.e("imagePath", filePath);
+//                }
+                val uri: Uri? = data !!.data
+                val file = File(uri !!.path!!)
+                val split = file.path.split(":").toTypedArray()
+                filePath = split[1]
+
+                Glide.with(context).load(selectedImage).placeholder(R.drawable.profile_image).into(imageProfile)
             }
             1 -> if (resultCode == RESULT_OK) {
                 val selectedImage: Uri? = data?.data
                 Log.e("selected", selectedImage.toString())
-                Glide.with(context).load(selectedImage).into(imageProfile)
-//                imageProfile.setImageURI(selectedImage)
+
+                Glide.with(context).load(selectedImage).placeholder(R.drawable.profile_image).into(imageProfile)
             }
         }
     }
 
-    private class UpdateProfile : AsyncTask<Void?, Int?, String?>() {
-        /**
-         * Add Progress Dialog
-         * */
-        private val obj: JSONObject? = null
-        private val responseString = ""
-        override fun doInBackground(vararg params: Void?): String? {
-            TODO("Not yet implemented")
-        }
-        private fun uploadFile(): String{
-            var responseString = ""
-            return responseString
-        }
+    private fun getPathFromURI(uri: Uri) {
+        var path: String = uri.path !! // uri = any content Uri
 
-        override fun onPreExecute() {
-            /**Start progress**/
-            super.onPreExecute()
+        val databaseUri: Uri
+        val selection: String?
+        val selectionArgs: Array<String>?
+        if (path.contains("/document/image:")) { // files selected from "Documents"
+            databaseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            selection = "_id=?"
+            selectionArgs = arrayOf(DocumentsContract.getDocumentId(uri).split(":")[1])
+        } else { // files selected from all other sources, especially on Samsung devices
+            databaseUri = uri
+            selection = null
+            selectionArgs = null
         }
+        try {
+            val projection = arrayOf(
+                MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.ORIENTATION,
+                MediaStore.Images.Media.DATE_TAKEN
+            ) // some example data you can query
+            val cursor = contentResolver.query(
+                databaseUri,
+                projection, selection, selectionArgs, null
+            )
+            if (cursor !!.moveToFirst()) {
+                val columnIndex = cursor.getColumnIndex(projection[0])
+                filePath = cursor.getString(columnIndex)
+                // Log.e("path", imagePath);
 
-        override fun onPostExecute(result: String?) {
-            super.onPostExecute(result)
-        }
-
-        override fun onProgressUpdate(vararg values: Int?) {
-            super.onProgressUpdate(*values)
-        }
-
-        override fun onCancelled(result: String?) {
-            super.onCancelled(result)
-        }
-
-        override fun onCancelled() {
-            super.onCancelled()
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("Err", e.message, e)
         }
     }
+
 
     override fun onBackPressed() {
         super.onBackPressed()
         val intent = Intent(context,HomeActivity::class.java)
         startActivity(intent)
     }
+
+
 
 }

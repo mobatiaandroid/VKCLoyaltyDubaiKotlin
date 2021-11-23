@@ -19,10 +19,11 @@ import com.vkc.loyaltyme.activity.issue_points.model.user_type.TypeModel
 import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionModel
 import com.vkc.loyaltyme.activity.profile.model.profile.ProfileModel
 import com.vkc.loyaltyme.activity.profile.model.update_phone.UpdatePhoneModel
-import retrofit2.Call
+import com.vkc.loyaltyme.activity.profile.model.update_profile.UpdateProfileModel
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.Response
+import retrofit2.Call
 import retrofit2.http.*
 
 
@@ -154,7 +155,7 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST("getRetailerswithState")
-    fun getUserType(
+    fun getRetailersResponse(
         @Field("cust_id") customerID: String
     ): Call<TypeModel>
 
@@ -178,15 +179,17 @@ interface ApiService {
 
     @Multipart
     @POST("profile_updation")
-    fun updateProfile(
-     @Part("cust_id") customerID: RequestBody,
-     @Part("role") role: RequestBody,
-     @Part("phone") phone: RequestBody,
-     @Part("contact_person") owner: RequestBody,
-     @Part("city") city: RequestBody,
-     @Part("phone2") phone2: RequestBody,
-     @Part("email") email: RequestBody
-    ): Call<ResponseBody>
+    fun getUpdateProfileResponse(
+        @Part("cust_id") customerID: RequestBody,
+        @Part("role") role: RequestBody,
+        @Part("phone") mobileNo: RequestBody,
+        @Part("contact_person") contactPerson: RequestBody,
+        @Part("city") city: RequestBody,
+        @Part("phone2") mobileNo2: RequestBody,
+        @Part("email") email: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Call<UpdateProfileModel>
+
 
 
 

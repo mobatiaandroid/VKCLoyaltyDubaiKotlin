@@ -121,33 +121,50 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.3" />
+                    app:layout_constraintGuide_percent=".10" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent=".90" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".10" />
+                <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".90" />
+
                 <com.github.lzyzsd.circleprogress.ArcProgress
                     android:id="@+id/arc_progress"
                     android:layout_width="250dp"
                     android:layout_height="250dp"
                     android:background="#214193"
-                    custom:arc_bottom_text="Coupons"
-                    custom:arc_text_size="30dp"
-                    custom:arc_bottom_text_size="60dp"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toTopOf="@+id/textPoint"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/guideline2"
+                    app:layout_constraintTop_toTopOf="@+id/guideline"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/llDescription"/>
+                    custom:arc_bottom_text="Coupons"
+                    custom:arc_bottom_text_size="60dp"
+                    custom:arc_text_size="30dp" />
 
                 <devlight.io.library.ArcProgressStackView
                     android:id="@+id/arcProgressStackView"
-                    android:layout_width="250dp"
-                    android:layout_height="250dp"
-                    android:layout_gravity="center"
-                    android:visibility="invisible"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="visible"
                     app:apsv_preview_colors="@array/bg"
-
-                    app:layout_constraintBottom_toTopOf="@+id/textPoint"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/llDescription" />
+                    app:layout_constraintBottom_toTopOf="@+id/guideline2"
+                    app:layout_constraintEnd_toEndOf="@id/guideline4"
+                    app:layout_constraintStart_toStartOf="@id/guideline3"
+                    app:layout_constraintTop_toTopOf="@+id/guideline" />
 
                 <com.vkc.loyaltyme.manager.CustomTextViewStylish
                     android:id="@+id/textPoint"

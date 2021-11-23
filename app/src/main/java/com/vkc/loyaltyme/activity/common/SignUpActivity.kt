@@ -6,6 +6,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.provider.Settings
+import android.provider.Settings.*
+import android.provider.Settings.Secure.*
 import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.AllCaps
@@ -17,7 +20,9 @@ import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.vkc.loyaltyapp.util.CustomToast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.common.model.district.DistrictResponseModel
 import com.vkc.loyaltyme.activity.common.model.new_register.NewRegisterModel
@@ -39,6 +44,7 @@ import com.vkc.loyaltyme.activity.common.model.resend_otp.ResendOTPModel
 import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
 import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.utils.ProgressBarDialog
+import java.security.AccessController.getContext
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -124,9 +130,17 @@ class SignUpActivity : AppCompatActivity() {
         editDoor.filters = arrayOf<InputFilter>(AllCaps())
         editAddress.filters = arrayOf<InputFilter>(AllCaps())
         editLandmark.filters = arrayOf<InputFilter>(AllCaps())
-//        androidID = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        androidID = "869835031132292"
+        androidID = getString(contentResolver, ANDROID_ID)
+//        androidID = "869835031132292"
         Log.e("AndroidID", androidID)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@OnCompleteListener
+            }
+
+            val token = task.result
+            Log.e("token", token.toString())
+        })
 
         imageSearch.setOnClickListener {
             if (editCustomer.text.toString().trim { it <= ' '} == "")  {

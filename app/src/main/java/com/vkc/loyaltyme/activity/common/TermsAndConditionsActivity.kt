@@ -1,18 +1,16 @@
 package com.vkc.loyaltyme.activity.common
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.CheckBox
-import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.dealers.DealersActivity
 import com.vkc.loyaltyme.activity.home.HomeActivity
-import com.vkc.loyaltyme.manager.CustomButtonWhite
 import com.vkc.loyaltyme.manager.PreferenceManager
 
 class TermsAndConditionsActivity : AppCompatActivity() {

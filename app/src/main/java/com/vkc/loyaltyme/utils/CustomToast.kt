@@ -1,10 +1,12 @@
-package com.vkc.loyaltyapp.util
+package com.vkc.loyaltyme.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.widget.TextView
 import android.widget.Toast
 import com.vkc.loyaltyme.R
 
+@SuppressLint("StaticFieldLeak")
 object CustomToast {
 
     lateinit var mActivity: Activity
@@ -12,7 +14,7 @@ object CustomToast {
     lateinit var mToast: Toast
 
     fun customToast(mActivity : Activity) {
-        this.mActivity = mActivity
+        CustomToast.mActivity = mActivity
 
         init()
 

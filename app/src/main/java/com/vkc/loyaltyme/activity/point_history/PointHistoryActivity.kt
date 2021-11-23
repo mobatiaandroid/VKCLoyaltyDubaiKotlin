@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
-import com.vkc.loyaltyapp.util.CustomToast
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.activity.point_history.adapter.TransactionHistoryAdapter
@@ -143,6 +143,7 @@ class PointHistoryActivity : AppCompatActivity() {
                     textCredit.text = transactionResponse.total_credits
                     textEarnedPoint.text = transactionResponse.total_credits
                     textTransffered.text = transactionResponse.total_debits
+                    textDealerCount.text = transactionResponse.data.size.toString()
                     textBalance.text = transactionResponse.balance_point
                     if (transactionResponse.status.equals("Success")){
                         if (transactionResponse.data.size > 0){
@@ -154,6 +155,8 @@ class PointHistoryActivity : AppCompatActivity() {
                                     AppController.transactionDetails.add(AppController.transactionData[i].details[j])
                                 }
                             }
+                            Log.e("Size",AppController.transactionData.size.toString())
+                            textDealerCount.text = AppController.transactionData.size.toString()
                             val adapter = TransactionHistoryAdapter()
                             listViewHistory.setAdapter(adapter)
                         }
