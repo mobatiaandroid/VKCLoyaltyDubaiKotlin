@@ -76,7 +76,6 @@ class DealersActivity : AppCompatActivity() {
             //listIds.clear();
             val jsonObject = JSONObject()
             val jsonArray = JSONArray()
-            Log.e("Size",AppController.dealersList.size.toString())
             for (i in 0 until AppController.dealersList.size) {
                 if (AppController.dealersList[i].is_assigned.equals("1")) {
 
@@ -123,10 +122,8 @@ class DealersActivity : AppCompatActivity() {
                         dealersRecyclerList.scrollToPosition(0)
                     } else {
                         for (i in AppController.dealersList.indices) {
-                            Log.e("Here",AppController.dealersList[i].name)
                             if (AppController.dealersList[i].name.lowercase().startsWith(s.toString().lowercase())) {
                                 dealersRecyclerList.scrollToPosition(i)
-                                Log.e("Here",AppController.dealersList[i].name)
                                 break
                             }
                         }
@@ -161,7 +158,6 @@ class DealersActivity : AppCompatActivity() {
                     if (response.body() != null){
                         dealersMainResponse = response.body()!!
                         dealersResponse = dealersMainResponse.response
-                        Log.e("Dealers",dealersResponse.toString())
                         if (dealersResponse.status.equals("Success")){
                             for (i in dealersResponse.data.indices){
                                 var tempModel: Data = Data("","","","")
@@ -177,7 +173,6 @@ class DealersActivity : AppCompatActivity() {
                             }
                             AppController.dealersList.addAll(dealersAssigned)
                             AppController.dealersList.addAll(dealersNotAssigned)
-                            Log.e("Dealers1",dealersList.toString())
                             adapter = DealersListAdapter(context, AppController.dealersList)
                             dealersRecyclerList.hasFixedSize()
                             dealersRecyclerList.layoutManager = LinearLayoutManager(
@@ -185,7 +180,6 @@ class DealersActivity : AppCompatActivity() {
                                 LinearLayoutManager.VERTICAL,
                                 false
                             )
-                            Log.e("Dealers2",dealersList.toString())
 
                             dealersRecyclerList.adapter = adapter
                         }else{

@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.Editable
@@ -18,6 +19,7 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.*
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -45,6 +47,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import java.io.File
 import kotlin.math.roundToInt
+import androidx.activity.result.ActivityResultCallback
+
+import androidx.activity.result.contract.ActivityResultContracts
+
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -71,6 +79,13 @@ class ProfileActivity : AppCompatActivity() {
     var imageCaptureUri: Uri? = null
     var otpValue = ""
     var filePath = ""
+//    var activityForResult = registerForActivityResult(StartActivityForResult()
+//    ) { result ->
+//        this@ProfileActivity.onActivityResult(1,
+//            result.resultCode,
+//            result.data)
+//    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -189,7 +204,6 @@ class ProfileActivity : AppCompatActivity() {
         var updateProfileResponse: com.vkc.loyaltyme.activity.profile.model.update_profile.Response
         if (UtilityMethods.checkInternet(context)){
             progressBarDialog.show()
-            Log.e("URI",imageCaptureUri.toString())
             val file = File(filePath)
             val requestFile: RequestBody =
                 RequestBody.create(MediaType.parse("multipart/form-data"), file)
@@ -215,7 +229,6 @@ class ProfileActivity : AppCompatActivity() {
                     call: Call<UpdateProfileModel>,
                     response: retrofit2.Response<UpdateProfileModel>,
                 ) {
-                    Log.e("Response",response.body().toString())
                     progressBarDialog.hide()
 
                     updateProfileMainResponse = response.body()!!
@@ -262,7 +275,6 @@ class ProfileActivity : AppCompatActivity() {
                     if (response.body() != null) {
                         profileMainResponse = response.body()!!
                         profileResponse = profileMainResponse.response
-                        Log.e("Response", profileResponse.toString())
                         if (profileResponse.status.equals("Success")) {
                             profileData = profileResponse.data
                             val name: String = profileData.name
@@ -496,6 +508,12 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun showCameraGalleryChoice() {
 
+//        val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//        val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureUri)
+//        val chooserIntent = Intent.createChooser(pickIntent, "Choose")
+//        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,takePhotoIntent as Parcelable)
+//        activityForResult.launch(chooserIntent);
         val dialogGetImageFrom = AlertDialog.Builder(context)
         dialogGetImageFrom.setTitle(resources.getString(R.string.select_item))
         val options = arrayOf<CharSequence>(
@@ -554,8 +572,6 @@ class ProfileActivity : AppCompatActivity() {
             }
             1 -> if (resultCode == RESULT_OK) {
                 val selectedImage: Uri? = data?.data
-                Log.e("selected", selectedImage.toString())
-
                 Glide.with(context).load(selectedImage).placeholder(R.drawable.profile_image).into(imageProfile)
             }
         }
@@ -590,7 +606,6 @@ class ProfileActivity : AppCompatActivity() {
             if (cursor !!.moveToFirst()) {
                 val columnIndex = cursor.getColumnIndex(projection[0])
                 filePath = cursor.getString(columnIndex)
-                // Log.e("path", imagePath);
 
             }
             cursor.close()

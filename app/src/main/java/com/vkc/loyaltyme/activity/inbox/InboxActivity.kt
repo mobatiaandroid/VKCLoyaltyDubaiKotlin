@@ -79,7 +79,6 @@ class InboxActivity : AppCompatActivity() {
                     notificationResponse = notificationMainResponse.response
                     if (notificationResponse.status.equals("Success")){
                         notificationData = notificationResponse.data
-                        Log.e("Notfi Res",notificationData.toString())
                         if (notificationData.size > 0){
                             for (i in notificationData.indices) {
                                 tempModel = Data("","","","",
@@ -93,7 +92,6 @@ class InboxActivity : AppCompatActivity() {
                                 tempModel.pdf = notificationData[i].pdf
                                 tempModel.notification_type = notificationData[i].notification_type
                                 AppController.notificationsList.add(tempModel)
-                                Log.e("temp",  AppController.notificationsList.toString())
                             }
 
                         }else{

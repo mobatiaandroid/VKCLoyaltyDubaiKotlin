@@ -139,7 +139,6 @@ class PointHistoryActivity : AppCompatActivity() {
                     progressBarDialog.hide()
                     transactionMainResponse = response.body()!!
                     transactionResponse = transactionMainResponse.response
-                    Log.e("transactionresponse",transactionResponse.toString())
                     textCredit.text = transactionResponse.total_credits
                     textEarnedPoint.text = transactionResponse.total_credits
                     textTransffered.text = transactionResponse.total_debits
@@ -155,7 +154,6 @@ class PointHistoryActivity : AppCompatActivity() {
                                     AppController.transactionDetails.add(AppController.transactionData[i].details[j])
                                 }
                             }
-                            Log.e("Size",AppController.transactionData.size.toString())
                             textDealerCount.text = AppController.transactionData.size.toString()
                             val adapter = TransactionHistoryAdapter()
                             listViewHistory.setAdapter(adapter)

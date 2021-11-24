@@ -25,18 +25,18 @@ import java.util.*
 class MyFirebaseMessagingService: FirebaseMessagingService() {
     private val tag = "MyFirebaseMessagingService"
     var bitmap: Bitmap? = null
-    private val channelID = getString(R.string.app_name) + "_01"
-    val name: CharSequence = getString(R.string.app_name)
+
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        if (remoteMessage.data.isNotEmpty()){
+        if (remoteMessage.data.isNotEmpty()
+        ){
             val json = JSONObject(remoteMessage.data.toString().replace("=".toRegex(), ":"))
             handleDataMessage(json)
         }
         if (remoteMessage.notification != null) {
-            sendNotification(remoteMessage.notification !!.body.toString())
+            sendNotification(remoteMessage.notification!!.body.toString())
             Log.d(tag, "Message Notification Body: " + remoteMessage.notification !!.body)
 
         }
@@ -45,6 +45,8 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun sendNotification(message: String) {
+        val channelID = getString(R.string.app_name) + "_01"
+        val name: CharSequence = getString(R.string.app_name)
         val random = Random()
         val randomNumber = random.nextInt(100)
         val intent = Intent(this, HomeActivity::class.java)

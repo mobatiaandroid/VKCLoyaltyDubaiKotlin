@@ -129,7 +129,6 @@ class IssuePointsActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (s.isNotEmpty()) {
-                    Log.e("selected", selectedId.toString())
                     if (selectedId!!.isNotEmpty()) {
                         llData.visibility = View.VISIBLE
                     }
@@ -170,7 +169,6 @@ class IssuePointsActivity : AppCompatActivity() {
                     if (response.body() != null){
                         myPointsMainResponse = response.body()!!
                         myPointsResponse = myPointsMainResponse.response
-                        Log.e("Response",myPointsResponse.toString())
                         if (myPointsResponse.status.equals("Success")){
                             val points = myPointsResponse.loyality_point
                             myPoint = points.toInt()

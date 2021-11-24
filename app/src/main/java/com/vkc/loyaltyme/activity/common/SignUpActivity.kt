@@ -131,8 +131,6 @@ class SignUpActivity : AppCompatActivity() {
         editAddress.filters = arrayOf<InputFilter>(AllCaps())
         editLandmark.filters = arrayOf<InputFilter>(AllCaps())
         androidID = getString(contentResolver, ANDROID_ID)
-//        androidID = "869835031132292"
-        Log.e("AndroidID", androidID)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 return@OnCompleteListener
@@ -530,7 +528,6 @@ class SignUpActivity : AppCompatActivity() {
                 ) {
                     progressBar.hide()
                     if (response.body() != null) {
-                        Log.e("UserDetailsMainResponse", response.body().toString())
                         userDetailsMainResponse = response.body()!!
                         userDetailsResponse = userDetailsMainResponse.response
                         if (userDetailsResponse.status.equals("Success")) {
@@ -552,11 +549,9 @@ class SignUpActivity : AppCompatActivity() {
                             }
 
                             /**Set District from get Data**/
-                            Log.e("District", district)
                             for (i in districtList.indices) {
                                 if (districtList[i].district.equals(district)) {
                                     spinnerDistrict.setSelection(i + 1)
-                                    Log.e("Here", district)
                                 }
                             }
 
@@ -564,7 +559,6 @@ class SignUpActivity : AppCompatActivity() {
                             mobileNo = userDetails.phone
                             /**Set Phone No**/
                             PreferenceManager.setMobileNo(context, mobileNo)
-                            Log.e("Logged In", isLoggedIn)
                             if (isLoggedIn.equals("0")) {
                                 val dealerCount = userDetails.dealers_count
                                 if (dealerCount > 0) {

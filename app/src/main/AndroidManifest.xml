@@ -86,11 +86,19 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.vkc.loyaltyme.utils.MyFirebaseMessagingService">
+            android:name="com.vkc.loyaltyme.utils.MyFirebaseMessagingService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notifi_dubai" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/caramine_pink" />
     </application>
 
 </manifest>

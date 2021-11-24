@@ -277,7 +277,6 @@ class HomeActivity : AppCompatActivity() {
                     if (response.body() != null){
                         myPointsMainResponse = response.body()!!
                         myPointsResponse = myPointsMainResponse.response
-                        Log.e("Response",myPointsResponse.toString())
                         if (myPointsResponse.status.equals("Success")){
                             val points = myPointsResponse.loyality_point
                             myPoints = points.toInt()
