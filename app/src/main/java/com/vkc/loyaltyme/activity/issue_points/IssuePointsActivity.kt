@@ -363,7 +363,6 @@ class IssuePointsActivity : AppCompatActivity() {
         }
     }
     override fun onBackPressed() {
-        super.onBackPressed()
         val intent = Intent(context, HomeActivity::class.java)
         startActivity(intent)
     }

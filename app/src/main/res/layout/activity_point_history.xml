@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".activity.point_history.PointHistoryActivity">
 
     <LinearLayout
@@ -43,7 +44,7 @@
                 android:visibility="visible" />
 
             <com.vkc.loyaltyme.manager.CustomTextView
-                android:id="@+id/textEarnedPoints"
+                android:id="@+id/textEarnedCouponsSubDealer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight=".50"
@@ -142,7 +143,7 @@
                 android:visibility="visible" />
 
             <com.vkc.loyaltyme.manager.CustomTextView
-                android:id="@+id/textEarned"
+                android:id="@+id/textEarnedCouponsRetailer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight=".50"

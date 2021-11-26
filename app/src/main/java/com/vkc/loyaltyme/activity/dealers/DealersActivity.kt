@@ -243,7 +243,6 @@ class DealersActivity : AppCompatActivity() {
         }
     }
     override fun onBackPressed() {
-        super.onBackPressed()
         val intent = Intent(context,ProfileActivity::class.java)
         startActivity(intent)
     }

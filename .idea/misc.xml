@@ -25,6 +25,7 @@
         <entry key="app/src/main/res/layout/common_header_single.xml" value="0.22" />
         <entry key="app/src/main/res/layout/custom_toast.xml" value="0.12001811594202899" />
         <entry key="app/src/main/res/layout/dialog_alert.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/dialog_leave_without_update.xml" value="0.5" />
         <entry key="app/src/main/res/layout/dialog_otp_alert.xml" value="0.11141304347826086" />
         <entry key="app/src/main/res/layout/dialog_otp_alert_no_resend.xml" value="0.11594202898550725" />
         <entry key="app/src/main/res/layout/dialog_update.xml" value="0.25" />

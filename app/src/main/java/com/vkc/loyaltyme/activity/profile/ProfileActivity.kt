@@ -12,7 +12,6 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
@@ -44,7 +43,6 @@ import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.FileUtil
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -83,10 +81,22 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var fileGalleryResult: File
     lateinit var compressCameraResult: File
     lateinit var compressGalleryResult: File
+    var name: String = ""
+    var owner: String = ""
+    var district: String = ""
+    var city: String = ""
+    var state: String = ""
+    var pincode: String = ""
+    var phone: String = ""
+    var url: String = ""
+    var mobile2: String = ""
+    var email: String = ""
     var outputFileUri: Uri? = null
     var imageCaptureUri: Uri? = null
     var otpValue = ""
     var filePath = ""
+    var profileData: Data? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,9 +170,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
         imageBack.setOnClickListener {
-            val intent = Intent(context,HomeActivity::class.java)
-            startActivity(intent)
-            finish()
+            checkForChanges()
         }
         imageProfile.setOnClickListener {
 
@@ -202,6 +210,40 @@ class ProfileActivity : AppCompatActivity() {
                 showCameraGalleryChoice()
             }
         }
+    }
+
+    private fun checkForChanges() {
+        if (editOwner.text.toString().trim().equals(profileData !!.contact_person) &&
+                editPlace.text.toString().trim().equals(profileData !!.city) &&
+                editMobile2.text.toString().trim().equals(profileData !!.phone2) &&
+                editEmail.text.toString().trim().equals(profileData !!.email)){
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }else{
+            alertLeaveWithoutUpdate()
+        }
+    }
+
+    private fun alertLeaveWithoutUpdate()  {
+        val dialog = Dialog(context)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_leave_without_update)
+        val textYes = dialog.findViewById<View>(R.id.textYes)
+        val textNo = dialog.findViewById<View>(R.id.textNo)
+        textYes.setOnClickListener {
+            dialog.dismiss()
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        textNo.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+
     }
 
     private fun updateProfile() {
@@ -267,6 +309,41 @@ class ProfileActivity : AppCompatActivity() {
                     }
 
                 })
+            }else{
+                ApiClient.getApiService().getUpdateProfileResponseNoImage(
+                    customerID,
+                    role,
+                    mobileNo,
+                    ownerName,
+                    place,
+                    mobileNo2,
+                    email
+                ).enqueue(object : Callback<UpdateProfileModel> {
+                    override fun onResponse(
+                        call: Call<UpdateProfileModel>,
+                        response: retrofit2.Response<UpdateProfileModel>,
+                    ) {
+                        progressBarDialog.hide()
+
+                        updateProfileMainResponse = response.body()!!
+                        updateProfileResponse = updateProfileMainResponse.response
+                        if (updateProfileResponse.status.equals("Success")){
+                            CustomToast.customToast(context)
+                            CustomToast.show(26)
+                        }else{
+                            CustomToast.customToast(context)
+                            CustomToast.show(27)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<UpdateProfileModel>, t: Throwable) {
+                        progressBarDialog.hide()
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
+                        Log.e("error43564", t.toString())
+                    }
+
+                })
             }
         }else{
             CustomToast.customToast(context)
@@ -278,7 +355,6 @@ class ProfileActivity : AppCompatActivity() {
     private fun getProfile() {
         var profileMainResponse: ProfileModel
         var profileResponse: com.vkc.loyaltyme.activity.profile.model.profile.Response
-        var profileData: Data
         if (UtilityMethods.checkInternet(context)) {
             progressBarDialog.show()
             ApiClient.getApiService().getProfileResponse(
@@ -295,16 +371,16 @@ class ProfileActivity : AppCompatActivity() {
                         profileResponse = profileMainResponse.response
                         if (profileResponse.status.equals("Success")) {
                             profileData = profileResponse.data
-                            val name: String = profileData.name
-                            val owner: String = profileData.contact_person
-                            val district: String = profileData.district
-                            val city: String = profileData.city
-                            val state: String = profileData.state_name
-                            val pincode: String = profileData.pincode
-                            val phone: String = profileData.phone
-                            val url: String = profileData.image
-                            val mobile2: String = profileData.phone2
-                            val email: String = profileData.email
+                            name = profileData !!.name
+                            owner = profileData !!.contact_person
+                            district = profileData !!.district
+                            city = profileData !!.city
+                            state = profileData !!.state_name
+                            pincode = profileData !!.pincode
+                            phone = profileData !!.phone
+                            url = profileData !!.image
+                            mobile2 = profileData !!.phone2
+                            email = profileData !!.email
                             editMobile2.setText(mobile2)
                             editEmail.setText(email)
                             editShop.setText(name)
@@ -314,8 +390,8 @@ class ProfileActivity : AppCompatActivity() {
                             editPlace.setText(city)
                             editState.setText(state)
                             editPin.setText(pincode)
-                            editAddress.setText(profileData.address)
-                            textCustomerID.text = "CUST_ID: - " + profileData.customer_id
+                            editAddress.setText(profileData !!.address)
+                            textCustomerID.text = "CUST_ID: - " + profileData !!.customer_id
                             Glide.with(context).load(url).placeholder(R.drawable.profile_image)
                                 .into(imageProfile)
                         }
@@ -626,12 +702,16 @@ class ProfileActivity : AppCompatActivity() {
     }
 
 
-
-
     override fun onBackPressed() {
-        super.onBackPressed()
-        val intent = Intent(context,HomeActivity::class.java)
-        startActivity(intent)
+        if (editOwner.text.toString().trim().equals(profileData !!.contact_person) &&
+            editPlace.text.toString().trim().equals(profileData !!.city) &&
+            editMobile2.text.toString().trim().equals(profileData !!.phone2) &&
+            editEmail.text.toString().trim().equals(profileData !!.email)){
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
+        }else{
+            alertLeaveWithoutUpdate()
+        }
     }
 
 }

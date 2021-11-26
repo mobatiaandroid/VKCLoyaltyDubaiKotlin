@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.*
 import com.vkc.loyaltyme.utils.CustomToast
@@ -26,11 +25,11 @@ import kotlin.collections.ArrayList
 class PointHistoryActivity : AppCompatActivity() {
     lateinit var context: Activity
     lateinit var buttonLogin: Button
-    lateinit var textTransffered: TextView
+    lateinit var textEarnedPointRetailer: TextView
     lateinit var textDealerCount:TextView
     lateinit var textCredit:TextView
     lateinit var textDebit:TextView
-    lateinit var textEarnedPoint:TextView
+    lateinit var textEarnedPointSubDealer:TextView
     lateinit var textTransferred:TextView
     lateinit var textBalance:TextView
     lateinit var editUserName: EditText
@@ -40,11 +39,11 @@ class PointHistoryActivity : AppCompatActivity() {
     lateinit var listHistory: List<TransactionModel>
     lateinit var listViewHistory: ExpandableListView
     lateinit var headermanager: HeaderManager
-    lateinit var relativeHeader: LinearLayout
+    lateinit var header: LinearLayout
     lateinit var llTransaction:LinearLayout
     lateinit var llRetailer:LinearLayout
     lateinit var llSubDealer:LinearLayout
-    lateinit var mImageBack: ImageView
+    lateinit var imageBack: ImageView
     lateinit var progressBarDialog: ProgressBarDialog
     private var lastExpandedPosition = -1
 
@@ -59,12 +58,12 @@ class PointHistoryActivity : AppCompatActivity() {
     private fun initialiseUI() {
         listHistory = ArrayList<TransactionModel>()
         listViewHistory = findViewById<View>(R.id.listViewHistory) as ExpandableListView
-        relativeHeader = findViewById<View>(R.id.header) as LinearLayout
+        header = findViewById<View>(R.id.header) as LinearLayout
         llTransaction = findViewById<View>(R.id.llTransactionType) as LinearLayout
         llRetailer = findViewById<View>(R.id.llRetailer) as LinearLayout
         llSubDealer = findViewById<View>(R.id.llSubDealer) as LinearLayout
-        textTransffered = findViewById<View>(R.id.textEarned) as TextView
-        textEarnedPoint = findViewById<View>(R.id.textEarnedPoints) as TextView
+        textEarnedPointRetailer = findViewById<View>(R.id.textEarnedCouponsRetailer) as TextView
+        textEarnedPointSubDealer = findViewById<View>(R.id.textEarnedCouponsSubDealer) as TextView
         textTransferred = findViewById<View>(R.id.textTransferred) as TextView
         textBalance = findViewById<View>(R.id.textBalance) as TextView
         textDealerCount = findViewById<View>(R.id.textDealerCount) as TextView
@@ -73,13 +72,13 @@ class PointHistoryActivity : AppCompatActivity() {
         progressBarDialog = ProgressBarDialog(context)
         headermanager =
             HeaderManager(this@PointHistoryActivity, resources.getString(R.string.point_history))
-        headermanager.getHeader(relativeHeader, 1)
-        mImageBack = headermanager.leftButton!!
+        headermanager.getHeader(header, 1)
+        imageBack = headermanager.leftButton!!
         headermanager.setButtonLeftSelector(
             R.drawable.back,
             R.drawable.back
         )
-        mImageBack.setOnClickListener {
+        imageBack.setOnClickListener {
             val intent = Intent(context,HomeActivity::class.java)
             startActivity(intent)
             finish()
@@ -142,8 +141,8 @@ class PointHistoryActivity : AppCompatActivity() {
                     transactionMainResponse = response.body()!!
                     transactionResponse = transactionMainResponse.response
                     textCredit.text = transactionResponse.total_credits
-                    textEarnedPoint.text = transactionResponse.total_credits
-                    textTransffered.text = transactionResponse.total_debits
+                    textEarnedPointSubDealer.text = transactionResponse.total_credits
+                    textEarnedPointRetailer.text = transactionResponse.total_debits
                     textDealerCount.text = transactionResponse.data.size.toString()
                     textBalance.text = transactionResponse.balance_point
                     if (transactionResponse.status.equals("Success")){
@@ -175,7 +174,6 @@ class PointHistoryActivity : AppCompatActivity() {
         }
     }
     override fun onBackPressed() {
-        super.onBackPressed()
         val intent = Intent(context, HomeActivity::class.java)
         startActivity(intent)
     }

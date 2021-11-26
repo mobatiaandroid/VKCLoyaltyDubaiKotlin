@@ -88,7 +88,6 @@ class HomeActivity : AppCompatActivity() {
                     ProfileActivity::class.java
                 )
             )
-            finish()
         }
         llPoints.setOnClickListener {
             startActivity(
@@ -97,7 +96,6 @@ class HomeActivity : AppCompatActivity() {
                     PointHistoryActivity::class.java
                 )
             )
-            finish()
         }
         llInbox.setOnClickListener {
             startActivity(
@@ -106,7 +104,6 @@ class HomeActivity : AppCompatActivity() {
                     InboxActivity::class.java
                 )
             )
-            finish()
         }
         buttonIssue.setOnClickListener {
             startActivity(

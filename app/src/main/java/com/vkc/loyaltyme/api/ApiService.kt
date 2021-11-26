@@ -190,7 +190,15 @@ interface ApiService {
         @Part image: MultipartBody.Part
     ): Call<UpdateProfileModel>
 
-
-
-
+    @Multipart
+    @POST("profile_updation")
+    fun getUpdateProfileResponseNoImage(
+        @Part("cust_id") customerID: RequestBody,
+        @Part("role") role: RequestBody,
+        @Part("phone") mobileNo: RequestBody,
+        @Part("contact_person") contactPerson: RequestBody,
+        @Part("city") city: RequestBody,
+        @Part("phone2") mobileNo2: RequestBody,
+        @Part("email") email: RequestBody
+    ): Call<UpdateProfileModel>
 }

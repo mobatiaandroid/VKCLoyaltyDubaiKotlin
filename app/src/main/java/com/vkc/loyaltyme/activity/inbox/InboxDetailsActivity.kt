@@ -94,7 +94,6 @@ class InboxDetailsActivity : AppCompatActivity() {
         webMessage.loadData(summary, "text/html", null)
     }
     override fun onBackPressed() {
-        super.onBackPressed()
         val intent = Intent(context, InboxActivity::class.java)
         startActivity(intent)
     }
