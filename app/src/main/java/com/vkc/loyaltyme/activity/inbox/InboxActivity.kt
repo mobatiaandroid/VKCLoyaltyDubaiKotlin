@@ -51,7 +51,9 @@ class InboxActivity : AppCompatActivity() {
             R.drawable.back,
             R.drawable.back
         )
-        imageBack.setOnClickListener { 
+        imageBack.setOnClickListener {
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
             finish()
         }
         getInbox()

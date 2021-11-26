@@ -6,8 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.provider.Settings
-import android.provider.Settings.*
 import android.provider.Settings.Secure.*
 import android.text.Editable
 import android.text.InputFilter
@@ -22,29 +20,28 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
-import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.common.model.district.DistrictResponseModel
 import com.vkc.loyaltyme.activity.common.model.new_register.NewRegisterModel
+import com.vkc.loyaltyme.activity.common.model.register.RegisterModel
+import com.vkc.loyaltyme.activity.common.model.resend_otp.ResendOTPModel
 import com.vkc.loyaltyme.activity.common.model.state.State
 import com.vkc.loyaltyme.activity.common.model.state.StateResponseModel
 import com.vkc.loyaltyme.activity.common.model.user_details.Data
 import com.vkc.loyaltyme.activity.common.model.user_details.UserDetailsResponseModel
+import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
 import com.vkc.loyaltyme.activity.dealers.DealersActivity
+import com.vkc.loyaltyme.activity.home.HomeActivity
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.manager.PreferenceManager
+import com.vkc.loyaltyme.utils.CustomToast
+import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
-import com.vkc.loyaltyme.activity.common.model.register.RegisterModel
-import com.vkc.loyaltyme.activity.common.model.resend_otp.ResendOTPModel
-import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
-import com.vkc.loyaltyme.activity.home.HomeActivity
-import com.vkc.loyaltyme.utils.ProgressBarDialog
-import java.security.AccessController.getContext
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -447,7 +444,6 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-
     private fun newRegisterAPI() {
         var newRegisterMainResponse: NewRegisterModel
         var newRegisterResponse: com.vkc.loyaltyme.activity.common.model.new_register.Response
@@ -621,10 +617,6 @@ class SignUpActivity : AppCompatActivity() {
                             llAddress.visibility = View.VISIBLE
                             llUserType.visibility = View.VISIBLE
                         }
-//                        else{
-//                            CustomToast.customToast(context)
-//                            CustomToast.show(0)
-//                        }
                     } else {
                         CustomToast.customToast(context)
                         CustomToast.show(0)

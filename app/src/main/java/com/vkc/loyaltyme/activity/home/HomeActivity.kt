@@ -88,6 +88,7 @@ class HomeActivity : AppCompatActivity() {
                     ProfileActivity::class.java
                 )
             )
+            finish()
         }
         llPoints.setOnClickListener {
             startActivity(
@@ -96,6 +97,7 @@ class HomeActivity : AppCompatActivity() {
                     PointHistoryActivity::class.java
                 )
             )
+            finish()
         }
         llInbox.setOnClickListener {
             startActivity(
@@ -104,6 +106,7 @@ class HomeActivity : AppCompatActivity() {
                     InboxActivity::class.java
                 )
             )
+            finish()
         }
         buttonIssue.setOnClickListener {
             startActivity(
@@ -112,6 +115,7 @@ class HomeActivity : AppCompatActivity() {
                     IssuePointsActivity::class.java
                 )
             )
+            finish()
         }
         if (PreferenceManager.getUserType(context).equals("7")){
             buttonIssue.visibility = View.VISIBLE
@@ -185,7 +189,7 @@ class HomeActivity : AppCompatActivity() {
         val appPackageName: String = context.packageName
         val builder = AlertDialog.Builder(context)
         builder.setTitle("New Update Available !")
-            .setMessage("Please update the app to avail new features") //
+            .setMessage("Please update the app to avail new features")
             .setPositiveButton("Ok") { _, _ ->
                 try {
                     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
@@ -345,10 +349,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
+
 
 
 }

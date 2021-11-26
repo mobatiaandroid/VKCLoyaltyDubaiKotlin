@@ -80,6 +80,8 @@ class PointHistoryActivity : AppCompatActivity() {
             R.drawable.back
         )
         mImageBack.setOnClickListener {
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
             finish()
         }
         textDebit.setOnClickListener {

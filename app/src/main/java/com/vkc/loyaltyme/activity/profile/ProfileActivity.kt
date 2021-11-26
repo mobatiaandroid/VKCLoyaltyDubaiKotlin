@@ -6,11 +6,12 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
+import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.text.Editable
@@ -19,11 +20,12 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.*
-import androidx.activity.result.ActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
+import com.vkc.loyaltyme.BuildConfig
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.common.SignUpActivity
 import com.vkc.loyaltyme.activity.common.model.verify_otp.VerifyOTPModel
@@ -40,19 +42,20 @@ import com.vkc.loyaltyme.manager.PreferenceManager
 import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.FileUtil
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import java.io.File
+import java.io.IOException
+import java.util.*
 import kotlin.math.roundToInt
-import androidx.activity.result.ActivityResultCallback
-
-import androidx.activity.result.contract.ActivityResultContracts
-
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 
 
 class ProfileActivity : AppCompatActivity() {
@@ -76,15 +79,15 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var imageBack: ImageView
     lateinit var imageProfile: ImageView
     lateinit var progressBarDialog: ProgressBarDialog
+    lateinit var fileCameraResult: File
+    lateinit var fileGalleryResult: File
+    lateinit var compressCameraResult: File
+    lateinit var compressGalleryResult: File
+    var outputFileUri: Uri? = null
     var imageCaptureUri: Uri? = null
     var otpValue = ""
     var filePath = ""
-//    var activityForResult = registerForActivityResult(StartActivityForResult()
-//    ) { result ->
-//        this@ProfileActivity.onActivityResult(1,
-//            result.resultCode,
-//            result.data)
-//    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +96,7 @@ class ProfileActivity : AppCompatActivity() {
         initialiseUI()
         getProfile()
     }
+
     private fun initialiseUI() {
         header = findViewById(R.id.header)
         buttonUpdate = findViewById(R.id.buttonUpdate)
@@ -120,7 +124,6 @@ class ProfileActivity : AppCompatActivity() {
             R.drawable.back,
             R.drawable.back
         )
-        // editMobile.setEnabled(false);
         editOwner.isEnabled = true
         editShop.isEnabled = false
         editState.isEnabled = false
@@ -157,10 +160,12 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
         imageBack.setOnClickListener {
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
             finish()
         }
         imageProfile.setOnClickListener {
-            Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()
+
             if (ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.CAMERA
@@ -204,51 +209,65 @@ class ProfileActivity : AppCompatActivity() {
         var updateProfileResponse: com.vkc.loyaltyme.activity.profile.model.update_profile.Response
         if (UtilityMethods.checkInternet(context)){
             progressBarDialog.show()
-            val file = File(filePath)
-            val requestFile: RequestBody =
-                RequestBody.create(MediaType.parse("multipart/form-data"), file)
-            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
-            val customerID: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"),PreferenceManager.getCustomerID(context))
-            val role: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), PreferenceManager.getUserType(context))
-            val mobileNo: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editMobile.text.toString().trim())
-            val ownerName: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editOwner.text.toString().trim())
-            val place: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editPlace.text.toString().trim())
-            val mobileNo2: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editMobile2.text.toString().trim())
-            val email: RequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), editEmail.text.toString().trim())
-            ApiClient.getApiService().getUpdateProfileResponse(
-                customerID,
-                role,
-                mobileNo,
-                ownerName,
-                place,
-                mobileNo2,
-                email,
-                body
-            ).enqueue(object : Callback<UpdateProfileModel> {
-                override fun onResponse(
-                    call: Call<UpdateProfileModel>,
-                    response: retrofit2.Response<UpdateProfileModel>,
-                ) {
-                    progressBarDialog.hide()
+            var requestFile: RequestBody? = null
+            var profilePic: MultipartBody.Part? = null
+            var file: File = File(filePath)
+            if (file.length() > 0) {
+                requestFile =
+                    file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
+                profilePic = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            }
+            val customerID: RequestBody = PreferenceManager.getCustomerID(context)
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val role: RequestBody = PreferenceManager.getUserType(context)
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val mobileNo: RequestBody = editMobile.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val ownerName: RequestBody = editOwner.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val place: RequestBody = editPlace.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val mobileNo2: RequestBody = editMobile2.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            val email: RequestBody = editEmail.text.toString().trim()
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            if (profilePic != null) {
+                ApiClient.getApiService().getUpdateProfileResponse(
+                    customerID,
+                    role,
+                    mobileNo,
+                    ownerName,
+                    place,
+                    mobileNo2,
+                    email,
+                    profilePic!!
+                ).enqueue(object : Callback<UpdateProfileModel> {
+                    override fun onResponse(
+                        call: Call<UpdateProfileModel>,
+                        response: retrofit2.Response<UpdateProfileModel>,
+                    ) {
+                        progressBarDialog.hide()
 
-                    updateProfileMainResponse = response.body()!!
-                    updateProfileResponse = updateProfileMainResponse.response
-                    if (updateProfileResponse.status.equals("Success")){
-                        CustomToast.customToast(context)
-                        CustomToast.show(26)
-                    }else{
-                        CustomToast.customToast(context)
-                        CustomToast.show(27)
+                        updateProfileMainResponse = response.body()!!
+                        updateProfileResponse = updateProfileMainResponse.response
+                        if (updateProfileResponse.status.equals("Success")){
+                            CustomToast.customToast(context)
+                            CustomToast.show(26)
+                        }else{
+                            CustomToast.customToast(context)
+                            CustomToast.show(27)
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<UpdateProfileModel>, t: Throwable) {
-                    progressBarDialog.hide()
-                    CustomToast.customToast(context)
-                    CustomToast.show(0)
-                }
+                    override fun onFailure(call: Call<UpdateProfileModel>, t: Throwable) {
+                        progressBarDialog.hide()
+                        CustomToast.customToast(context)
+                        CustomToast.show(0)
+                        Log.e("error43564", t.toString())
+                    }
 
-            })
+                })
+            }
         }else{
             CustomToast.customToast(context)
             CustomToast.show(58)
@@ -265,7 +284,6 @@ class ProfileActivity : AppCompatActivity() {
             ApiClient.getApiService().getProfileResponse(
                 PreferenceManager.getCustomerID(context),
                 PreferenceManager.getUserType(context)
-//            "23703","5"
             ).enqueue(object : Callback<ProfileModel> {
                 override fun onResponse(
                     call: Call<ProfileModel>,
@@ -348,7 +366,6 @@ class ProfileActivity : AppCompatActivity() {
                 PreferenceManager.getCustomerID(context),
                 PreferenceManager.getUserType(context),
                 editMobile.text.toString().trim()
-//            "23703","5","9567456927"
             ).enqueue(object : Callback<UpdatePhoneModel> {
                 override fun onResponse(
                     call: Call<UpdatePhoneModel>,
@@ -507,13 +524,6 @@ class ProfileActivity : AppCompatActivity() {
 
 
     private fun showCameraGalleryChoice() {
-
-//        val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//        val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageCaptureUri)
-//        val chooserIntent = Intent.createChooser(pickIntent, "Choose")
-//        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,takePhotoIntent as Parcelable)
-//        activityForResult.launch(chooserIntent);
         val dialogGetImageFrom = AlertDialog.Builder(context)
         dialogGetImageFrom.setTitle(resources.getString(R.string.select_item))
         val options = arrayOf<CharSequence>(
@@ -526,8 +536,21 @@ class ProfileActivity : AppCompatActivity() {
             when(which){
              0 -> {
                  try{
-                     val takePicture = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                     startActivityForResult(takePicture, 0)
+                     val imageFileName =
+                            System.currentTimeMillis().toString() + ".jpg"
+                        var storageDir: File = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES)
+                        filePath = storageDir.absolutePath + "/" + imageFileName
+                        Log.e("PICTUREPATH : ", filePath)
+                        val file = File(filePath)
+                        outputFileUri = FileProvider.getUriForFile(
+                            this,
+                            BuildConfig.APPLICATION_ID + "." + localClassName + ".provider",
+                            file);
+                        val cameraIntent =
+                            Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri)
+                        startActivityForResult(cameraIntent, 0)
                  }catch (e: Exception){
                      Log.e("Error",e.toString())
                  }
@@ -547,72 +570,62 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.e("Data",data.toString())
-        when (requestCode) {
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            fileCameraResult = File(filePath)
+            if (fileCameraResult.exists()) {
+                try {
+                    fileCameraResult = FileUtil.from(context, outputFileUri)
+                    compressCameraResult = Compressor.Builder(context)
+                        .setMaxWidth(940f)
+                        .setMaxHeight(800f)
+                        .setQuality(100)
+                        .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                        .setDestinationDirectoryPath(
+                            Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES
+                            ).absolutePath
+                        )
+                        .build()
+                        .compressToFile(fileCameraResult)
+                    Glide.with(context).load(outputFileUri).placeholder(R.drawable.profile_image)
+                        .into(imageProfile)
+                    filePath = compressCameraResult.path
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
 
-            0 -> if (resultCode == RESULT_OK) {
-                val selectedImage: Uri? = data?.data
-
-//                if (data !!.clipData != null) {
-//                    var count = data.clipData !!.itemCount
-//                    for (i in 0 until count) {
-//                        imageCaptureUri = data.clipData !!.getItemAt(i).uri
-//                        getPathFromURI(imageCaptureUri!!)
-//                    }
-//                } else if (data.data != null) {
-//                    filePath = data.data !!.path !!
-//                    Log.e("imagePath", filePath);
-//                }
-                val uri: Uri? = data !!.data
-                val file = File(uri !!.path!!)
-                val split = file.path.split(":").toTypedArray()
-                filePath = split[1]
-
-                Glide.with(context).load(selectedImage).placeholder(R.drawable.profile_image).into(imageProfile)
             }
-            1 -> if (resultCode == RESULT_OK) {
-                val selectedImage: Uri? = data?.data
-                Glide.with(context).load(selectedImage).placeholder(R.drawable.profile_image).into(imageProfile)
+        }
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                Toast.makeText(context, "Cannot show image", Toast.LENGTH_SHORT).show()
+                return
+            }
+            try {
+                fileGalleryResult = FileUtil.from(context, data.data)
+                compressGalleryResult = Compressor.Builder(context)
+                    .setMaxWidth(940f)
+                    .setMaxHeight(800f)
+                    .setQuality(100)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .setDestinationDirectoryPath(
+                        Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES
+                        ).absolutePath
+                    )
+                    .build()
+                    .compressToFile(fileGalleryResult)
+                Glide.with(context).load(data.data).placeholder(R.drawable.profile_image)
+                    .into(imageProfile)
+                Log.e("path", fileGalleryResult.path)
+                filePath = compressGalleryResult.path
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
     }
 
-    private fun getPathFromURI(uri: Uri) {
-        var path: String = uri.path !! // uri = any content Uri
 
-        val databaseUri: Uri
-        val selection: String?
-        val selectionArgs: Array<String>?
-        if (path.contains("/document/image:")) { // files selected from "Documents"
-            databaseUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            selection = "_id=?"
-            selectionArgs = arrayOf(DocumentsContract.getDocumentId(uri).split(":")[1])
-        } else { // files selected from all other sources, especially on Samsung devices
-            databaseUri = uri
-            selection = null
-            selectionArgs = null
-        }
-        try {
-            val projection = arrayOf(
-                MediaStore.Images.Media.DATA,
-                MediaStore.Images.Media._ID,
-                MediaStore.Images.Media.ORIENTATION,
-                MediaStore.Images.Media.DATE_TAKEN
-            ) // some example data you can query
-            val cursor = contentResolver.query(
-                databaseUri,
-                projection, selection, selectionArgs, null
-            )
-            if (cursor !!.moveToFirst()) {
-                val columnIndex = cursor.getColumnIndex(projection[0])
-                filePath = cursor.getString(columnIndex)
-
-            }
-            cursor.close()
-        } catch (e: Exception) {
-            Log.e("Err", e.message, e)
-        }
-    }
 
 
     override fun onBackPressed() {
@@ -620,7 +633,5 @@ class ProfileActivity : AppCompatActivity() {
         val intent = Intent(context,HomeActivity::class.java)
         startActivity(intent)
     }
-
-
 
 }

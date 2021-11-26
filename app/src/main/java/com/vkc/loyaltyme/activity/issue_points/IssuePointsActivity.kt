@@ -87,6 +87,8 @@ class IssuePointsActivity : AppCompatActivity() {
         arcProgress.setBackgroundColor(getColor(R.color.transparent))
         arcProgress.unfinishedStrokeColor = getColor(R.color.white)
         imageBack.setOnClickListener {
+            val intent = Intent(context,HomeActivity::class.java)
+            startActivity(intent)
             finish()
         }
         buttonIssue.setOnClickListener {

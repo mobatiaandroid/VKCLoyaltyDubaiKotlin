@@ -21,6 +21,7 @@ import com.vkc.loyaltyme.activity.dealers.model.dealers.DealersModel
 import com.vkc.loyaltyme.activity.dealers.model.dealers.Response
 import com.vkc.loyaltyme.activity.dealers.model.submit.SubmitDealersModel
 import com.vkc.loyaltyme.activity.home.HomeActivity
+import com.vkc.loyaltyme.activity.profile.ProfileActivity
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.app_controller.AppController
 import com.vkc.loyaltyme.manager.HeaderManager
@@ -38,6 +39,7 @@ class DealersActivity : AppCompatActivity() {
     lateinit var headerManager: HeaderManager
     lateinit var header: LinearLayout
     lateinit var imageBack: ImageView
+
     lateinit var editSearch: EditText
     lateinit var dealersList: ArrayList<Data>
     lateinit var tempDealer: ArrayList<Data>
@@ -72,8 +74,6 @@ class DealersActivity : AppCompatActivity() {
             finish()
         }
         textSubmit.setOnClickListener {
-            //listIds.clear();
-            //listIds.clear();
             val jsonObject = JSONObject()
             val jsonArray = JSONArray()
             for (i in 0 until AppController.dealersList.size) {
@@ -100,15 +100,6 @@ class DealersActivity : AppCompatActivity() {
             }
 
         }
-//        editSearch.setOnKeyListener { v, keyCode, event ->
-//            if (event.action == KeyEvent.ACTION_DOWN) {
-//                when(keyCode){
-//                    KeyEvent.KEYCODE_DPAD_CENTER -> true
-//                    KeyEvent.KEYCODE_ENTER -> true
-//                }
-//            }
-//            false
-//        }
         editSearch.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -148,7 +139,6 @@ class DealersActivity : AppCompatActivity() {
                 PreferenceManager.getCustomerID(context),
                 PreferenceManager.getUserType(context),
                 searchKey
-//            "23703","5",""
             ).enqueue(object : Callback<DealersModel>{
                 override fun onResponse(
                     call: Call<DealersModel>,
@@ -183,7 +173,7 @@ class DealersActivity : AppCompatActivity() {
 
                             dealersRecyclerList.adapter = adapter
                         }else{
-                            /****    * 
+                            /****    *
                              * Empty *
                              *   ****/
                         }
@@ -254,7 +244,7 @@ class DealersActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent = Intent(context,HomeActivity::class.java)
+        val intent = Intent(context,ProfileActivity::class.java)
         startActivity(intent)
     }
 }

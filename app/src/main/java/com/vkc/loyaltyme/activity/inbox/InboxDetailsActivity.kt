@@ -84,6 +84,8 @@ class InboxDetailsActivity : AppCompatActivity() {
             textPinch.visibility = View.GONE
         }
         imageBack.setOnClickListener {
+            val intent = Intent(context,InboxActivity::class.java)
+            startActivity(intent)
             finish()
         }
         textTitle.text = title
