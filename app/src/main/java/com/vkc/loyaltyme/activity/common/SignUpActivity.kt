@@ -207,6 +207,7 @@ class SignUpActivity : AppCompatActivity() {
         spinnerUserType.adapter = adapter
         getState()
 
+
         editCustomer.setOnKeyListener { v, keyCode, event ->
             if (keyCode.equals(KeyEvent.KEYCODE_DPAD_CENTER)
                 || keyCode.equals(KeyEvent.KEYCODE_ENTER)

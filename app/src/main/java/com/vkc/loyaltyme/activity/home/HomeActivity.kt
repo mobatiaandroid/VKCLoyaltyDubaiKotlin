@@ -81,6 +81,14 @@ class HomeActivity : AppCompatActivity() {
         progressStackView = findViewById(R.id.arcProgressStackView)
         arcProgress = findViewById(R.id.arc_progress)
         progressBarDialog = ProgressBarDialog(context)
+
+        arcProgress.suffixText = ""
+        arcProgress.strokeWidth = 15f
+        arcProgress.max = 10000000
+        arcProgress.bottomTextSize = 80f
+        arcProgress.unfinishedStrokeColor = getColor(R.color.white)
+        arcProgress.textColor = getColor(R.color.white)
+        arcProgress.setBackgroundColor(getColor(R.color.transparent))
         llProfile.setOnClickListener {
             startActivity(
                 Intent(
@@ -144,7 +152,7 @@ class HomeActivity : AppCompatActivity() {
                 .enqueue(object : Callback<AppVersionModel> {
                     override fun onResponse(
                         call: Call<AppVersionModel>,
-                        response: retrofit2.Response<AppVersionModel>
+                        response: retrofit2.Response<AppVersionModel>,
                     ) {
                         progressBarDialog.hide()
                         if (response.body() != null){
@@ -222,7 +230,7 @@ class HomeActivity : AppCompatActivity() {
             ).enqueue(object : Callback<DeviceRegistrationModel> {
                 override fun onResponse(
                     call: Call<DeviceRegistrationModel>,
-                    response: retrofit2.Response<DeviceRegistrationModel>
+                    response: retrofit2.Response<DeviceRegistrationModel>,
                 ) {
                     progressBarDialog.hide()
                     if (response.body() != null){
@@ -272,7 +280,7 @@ class HomeActivity : AppCompatActivity() {
             ).enqueue(object : Callback<MyPointsModel> {
                 override fun onResponse(
                     call: Call<MyPointsModel>,
-                    response: retrofit2.Response<MyPointsModel>
+                    response: retrofit2.Response<MyPointsModel>,
                 ) {
                     progressBarDialog.hide()
                     if (response.body() != null){
