@@ -30,7 +30,7 @@ class PointHistoryActivity : AppCompatActivity() {
     lateinit var textCredit:TextView
     lateinit var textDebit:TextView
     lateinit var textEarnedPointSubDealer:TextView
-    lateinit var textTransferred:TextView
+    lateinit var textTransferredSubDealer:TextView
     lateinit var textBalance:TextView
     lateinit var editUserName: EditText
     lateinit var editPassword:EditText
@@ -38,7 +38,7 @@ class PointHistoryActivity : AppCompatActivity() {
     lateinit var historyType: String
     lateinit var listHistory: List<TransactionModel>
     lateinit var listViewHistory: ExpandableListView
-    lateinit var headermanager: HeaderManager
+    lateinit var headerManager: HeaderManager
     lateinit var header: LinearLayout
     lateinit var llTransaction:LinearLayout
     lateinit var llRetailer:LinearLayout
@@ -64,17 +64,17 @@ class PointHistoryActivity : AppCompatActivity() {
         llSubDealer = findViewById<View>(R.id.llSubDealer) as LinearLayout
         textEarnedPointRetailer = findViewById<View>(R.id.textEarnedCouponsRetailer) as TextView
         textEarnedPointSubDealer = findViewById<View>(R.id.textEarnedCouponsSubDealer) as TextView
-        textTransferred = findViewById<View>(R.id.textTransferred) as TextView
+        textTransferredSubDealer = findViewById<View>(R.id.textTransferredCouponsSubDealer) as TextView
         textBalance = findViewById<View>(R.id.textBalance) as TextView
-        textDealerCount = findViewById<View>(R.id.textDealerCount) as TextView
+        textDealerCount = findViewById<View>(R.id.textDealerCountRetailer) as TextView
         textCredit = findViewById<View>(R.id.textCredit) as TextView
         textDebit = findViewById<View>(R.id.textDebit) as TextView
         progressBarDialog = ProgressBarDialog(context)
-        headermanager =
+        headerManager =
             HeaderManager(this@PointHistoryActivity, resources.getString(R.string.point_history))
-        headermanager.getHeader(header, 1)
-        imageBack = headermanager.leftButton!!
-        headermanager.setButtonLeftSelector(
+        headerManager.getHeader(header, 1)
+        imageBack = headerManager.leftButton!!
+        headerManager.setButtonLeftSelector(
             R.drawable.back,
             R.drawable.back
         )
@@ -85,7 +85,6 @@ class PointHistoryActivity : AppCompatActivity() {
         }
         textDebit.setOnClickListener {
             historyType = "DEBIT"
-
             val adapter = TransactionHistoryAdapter()
             listViewHistory.setAdapter(adapter)
             textCredit.setBackgroundResource(R.drawable.rounded_rect_redline)
@@ -140,9 +139,9 @@ class PointHistoryActivity : AppCompatActivity() {
                     progressBarDialog.hide()
                     transactionMainResponse = response.body()!!
                     transactionResponse = transactionMainResponse.response
-                    textCredit.text = transactionResponse.total_credits
+                    textEarnedPointRetailer.text = transactionResponse.total_credits
                     textEarnedPointSubDealer.text = transactionResponse.total_credits
-                    textEarnedPointRetailer.text = transactionResponse.total_debits
+                    textTransferredSubDealer.text = transactionResponse.total_debits
                     textDealerCount.text = transactionResponse.data.size.toString()
                     textBalance.text = transactionResponse.balance_point
                     if (transactionResponse.status.equals("Success")){
