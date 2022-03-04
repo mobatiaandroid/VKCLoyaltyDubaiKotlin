@@ -223,16 +223,28 @@
 
     </LinearLayout>
 
-    <ExpandableListView
-        android:id="@+id/listViewHistory"
+    <!--    <ExpandableListView-->
+    <!--        android:id="@+id/listViewHistory"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:divider="@color/white"-->
+    <!--        android:dividerHeight="1dp"-->
+    <!--        android:groupIndicator="@null"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/llTransactionType" />-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerHistory"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:divider="@color/white"
         android:dividerHeight="1dp"
-        android:groupIndicator="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/llTransactionType" />
+        app:layout_constraintTop_toBottomOf="@+id/llTransactionType">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

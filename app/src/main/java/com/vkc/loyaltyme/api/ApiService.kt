@@ -17,6 +17,7 @@ import com.vkc.loyaltyme.activity.issue_points.model.submit_points.SubmitPointsR
 import com.vkc.loyaltyme.activity.issue_points.model.user.UserModel
 import com.vkc.loyaltyme.activity.issue_points.model.user_type.TypeModel
 import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionModel
+import com.vkc.loyaltyme.activity.point_history.model.transaction_new.TransactionModelNew
 import com.vkc.loyaltyme.activity.profile.model.profile.ProfileModel
 import com.vkc.loyaltyme.activity.profile.model.update_phone.UpdatePhoneModel
 import com.vkc.loyaltyme.activity.profile.model.update_profile.UpdateProfileModel
@@ -169,13 +170,20 @@ interface ApiService {
         @Field("role") role: String
     ): Call<SubmitPointsResponse>
 
+    //    @FormUrlEncoded
+//    @POST("transaction_history")
+//    fun getTransactionHistoryResponse(
+//        @Field("user_id") customerID: String,
+//        @Field("role") role: String,
+//        @Field("type") type: String
+//    ): Call<TransactionModel>
     @FormUrlEncoded
     @POST("transaction_history")
-    fun getTransactionHistoryResponse(
-        @Field("userid") customerID: String,
+    fun getTransactionHistoryResponseNew(
+        @Field("user_id") customerID: String,
         @Field("role") role: String,
-        @Field("type") type: String
-    ): Call<TransactionModel>
+        @Field("type") type: String,
+    ): Call<TransactionModelNew>
 
     @Multipart
     @POST("profile_updation")

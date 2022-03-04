@@ -15,8 +15,8 @@
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.18" />
         <entry key="app/src/main/res/layout/activity_inbox.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_inbox_details.xml" value="0.13" />
-        <entry key="app/src/main/res/layout/activity_issue_points.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_point_history.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_issue_points.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_point_history.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_profile.xml" value="0.2965641952983725" />
         <entry key="app/src/main/res/layout/activity_sign_up.xml" value="0.22" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.11141304347826086" />
