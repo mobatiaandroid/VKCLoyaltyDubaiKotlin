@@ -2,29 +2,26 @@ package com.vkc.loyaltyme.activity.point_history
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.home.HomeActivity
-import com.vkc.loyaltyme.activity.point_history.adapter.TransactionHistoryAdapter
 import com.vkc.loyaltyme.activity.point_history.adapter.TransactionHistoryAdapterNew
-import com.vkc.loyaltyme.activity.point_history.model.transaction.Response
-import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionModel
 import com.vkc.loyaltyme.activity.point_history.model.transaction_new.TransactionModelNew
 import com.vkc.loyaltyme.api.ApiClient
 import com.vkc.loyaltyme.app_controller.AppController
 import com.vkc.loyaltyme.manager.HeaderManager
 import com.vkc.loyaltyme.manager.PreferenceManager
+import com.vkc.loyaltyme.utils.CustomToast
 import com.vkc.loyaltyme.utils.ProgressBarDialog
 import com.vkc.loyaltyme.utils.UtilityMethods
 import retrofit2.Call
 import retrofit2.Callback
-import kotlin.collections.ArrayList
 
 class PointHistoryActivity : AppCompatActivity() {
     lateinit var context: Activity
@@ -40,7 +37,7 @@ class PointHistoryActivity : AppCompatActivity() {
     lateinit var editPassword:EditText
     lateinit var imeiNo: String
     lateinit var historyType: String
-    lateinit var listHistory: List<TransactionModel>
+//    lateinit var listHistory: List<TransactionModel>
 
     //    lateinit var listViewHistory: ExpandableListView
     lateinit var recyclerHistory: RecyclerView
@@ -51,7 +48,7 @@ class PointHistoryActivity : AppCompatActivity() {
     lateinit var llSubDealer:LinearLayout
     lateinit var imageBack: ImageView
     lateinit var progressBarDialog: ProgressBarDialog
-    private var lastExpandedPosition = -1
+//    private var lastExpandedPosition = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +59,7 @@ class PointHistoryActivity : AppCompatActivity() {
     }
 
     private fun initialiseUI() {
-        listHistory = ArrayList<TransactionModel>()
+//        listHistory = ArrayList<TransactionModel>()
 //        listViewHistory = findViewById<View>(R.id.listViewHistory) as ExpandableListView
         recyclerHistory = findViewById<View>(R.id.recyclerHistory) as RecyclerView
         header = findViewById<View>(R.id.header) as LinearLayout
@@ -88,6 +85,7 @@ class PointHistoryActivity : AppCompatActivity() {
         )
         imageBack.setOnClickListener {
             val intent = Intent(context,HomeActivity::class.java)
+            AppController.transactionDataNew.clear()
             startActivity(intent)
             finish()
         }
@@ -97,7 +95,7 @@ class PointHistoryActivity : AppCompatActivity() {
             val adapter = TransactionHistoryAdapterNew()
 
 //            listViewHistory.setAdapter(adapter)
-            recyclerHistory.setAdapter(adapter)
+            recyclerHistory.adapter = adapter
             textCredit.setBackgroundResource(R.drawable.rounded_rect_redline)
             textDebit.setBackgroundResource(R.drawable.rounded_rect_green)
 //            getHistory()
@@ -110,7 +108,7 @@ class PointHistoryActivity : AppCompatActivity() {
 //            val adapter = TransactionHistoryAdapter()
             val adapter = TransactionHistoryAdapterNew()
 //            listViewHistory.setAdapter(adapter)
-            recyclerHistory.setAdapter(adapter)
+            recyclerHistory.adapter = adapter
 //            getHistory()
             getHistoryNew()
         }
@@ -198,7 +196,30 @@ class PointHistoryActivity : AppCompatActivity() {
     private fun getHistoryNew() {
         var transactionMainResponse: TransactionModelNew
         var transactionResponse: TransactionModelNew.Response
+        AppController.transactionDataNew.clear()
         if (UtilityMethods.checkInternet(context)) {
+//            val tempDetails: ArrayList<TransactionModelNew.Response.TransactionHistory.IndividualTransaction> = ArrayList()
+//            tempDetails.add(TransactionModelNew.Response.TransactionHistory.IndividualTransaction("50","DEBIT","SANJU","5","28/02/1998"))
+//            tempDetails.add(TransactionModelNew.Response.TransactionHistory.IndividualTransaction("50","DEBIT","SNJAU","5","28/02/1998"))
+//            tempDetails.add(TransactionModelNew.Response.TransactionHistory.IndividualTransaction("50","DEBIT","UJNAS","5","28/02/1998"))
+//            tempDetails.add(TransactionModelNew.Response.TransactionHistory.IndividualTransaction("50","DEBIT","JANSU","5","28/02/1998"))
+//            tempDetails.add(TransactionModelNew.Response.TransactionHistory.IndividualTransaction("50","DEBIT","JASNA","5","28/02/1998"))
+//
+//            val temp: TransactionModelNew.Response.TransactionHistory = TransactionModelNew.Response.TransactionHistory(tempDetails,"LAK","25")
+//            AppController.transactionDataNew.add(temp)
+//            AppController.transactionDataNew.add(temp)
+//            AppController.transactionDataNew.add(temp)
+//            AppController.transactionDataNew.add(temp)
+//            AppController.transactionDataNew.add(temp)
+//
+//            val adapter = TransactionHistoryAdapterNew()
+            recyclerHistory.layoutManager = LinearLayoutManager(
+                context,
+                LinearLayoutManager.VERTICAL,
+                false
+            )
+////                                listViewHistory.setAdapter(adapter)
+//                                recyclerHistory.adapter = adapter
             progressBarDialog.show()
             ApiClient.getApiService().getTransactionHistoryResponseNew(
                 "23703", "5", ""

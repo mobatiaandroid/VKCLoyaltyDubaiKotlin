@@ -4,7 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.android.tools.build.jetifier.core.utils.Log
 import com.vkc.loyaltyme.R
 import com.vkc.loyaltyme.activity.point_history.constants.Constants
 import com.vkc.loyaltyme.activity.point_history.model.transaction.TransactionHistory
@@ -12,6 +14,7 @@ import com.vkc.loyaltyme.activity.point_history.model.transaction_new.Transactio
 import com.vkc.loyaltyme.app_controller.AppController
 
 class TransactionHistoryAdapterNew() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    val historyList = AppController.transactionDataNew
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == Constants.PARENT) {
             val rowView: View = LayoutInflater.from(parent.context)
@@ -25,14 +28,14 @@ class TransactionHistoryAdapterNew() : RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val dataList = AppController.transactionDataNew[position]
+        val dataList = historyList[position]
         if (dataList.type == Constants.PARENT) {
             holder as GroupViewHolder
             holder.apply {
-                textUser.text = AppController.transactionData[position].to_name
-                val points = AppController.transactionData[position].tot_points
+                textUser.text = historyList[position].to_name
+                val points = historyList[position].tot_points
                 textPoint.text = "$points Coupons"
-                holder.itemView?.setOnClickListener {
+                holder.itemView.setOnClickListener {
                     expandOrCollapseParentItem(dataList, position)
                 }
             }
@@ -80,7 +83,7 @@ class TransactionHistoryAdapterNew() : RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private fun expandParentRow(position: Int) {
-        val currentBoardingRow = AppController.transactionDataNew[position]
+        val currentBoardingRow = historyList[position]
         val services = currentBoardingRow.details
         currentBoardingRow.isExpanded = true
         var nextPosition = position
@@ -94,26 +97,26 @@ class TransactionHistoryAdapterNew() : RecyclerView.Adapter<RecyclerView.ViewHol
                     ArrayList()
                 subList.add(service)
                 parentModel.details = subList
-                AppController.transactionDataNew.add(++ nextPosition, parentModel)
+                historyList.add(++ nextPosition, parentModel)
             }
             notifyDataSetChanged()
         }
     }
 
     private fun collapseParentRow(position: Int) {
-        val currentBoardingRow = AppController.transactionDataNew[position]
+        val currentBoardingRow = historyList[position]
         val services = currentBoardingRow.details
-        AppController.transactionDataNew[position].isExpanded = false
-        if (AppController.transactionDataNew[position].type == Constants.PARENT) {
+        historyList[position].isExpanded = false
+        if (historyList[position].type == Constants.PARENT) {
             services.forEach { _ ->
-                AppController.transactionDataNew.removeAt(position + 1)
+                historyList.removeAt(position + 1)
             }
             notifyDataSetChanged()
         }
     }
 
     override fun getItemViewType(position: Int): Int =
-        AppController.transactionDataNew[position].type
+        historyList[position].type
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
@@ -137,6 +140,7 @@ class TransactionHistoryAdapterNew() : RecyclerView.Adapter<RecyclerView.ViewHol
 
 
     override fun getItemCount(): Int {
-        return AppController.transactionData.size
+        return historyList.size
+        Log.e("Size", AppController.transactionDataNew.size.toString())
     }
 }
